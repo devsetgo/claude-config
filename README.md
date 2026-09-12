@@ -4,6 +4,26 @@ Claude code skills and other refinements for projects.
 Pulled into other projects via VS Code's dotfiles feature — keep everything
 here generic and reusable across projects. See `CLAUDE.md` for conventions.
 
+## Setup
+
+1. On your host machine (outside any container), add to VS Code user settings
+   (`Preferences: Open User Settings (JSON)`):
+
+   ```json
+   {
+     "dotfiles.repository": "devsetgo/claude-config",
+     "dotfiles.targetPath": "~/claude-config",
+     "dotfiles.installCommand": "install.sh"
+   }
+   ```
+
+2. Every devcontainer built after that clones this repo to `~/claude-config`
+   and runs `install.sh`, which symlinks `skills/` into `~/.claude/skills` —
+   so every skill here just shows up, no per-project devcontainer edits.
+
+To set it up manually on a machine without the dotfiles feature: clone this
+repo anywhere and run `./install.sh`.
+
 ## Skills
 
 | Skill | Description |
