@@ -18,11 +18,18 @@ here generic and reusable across projects. See `CLAUDE.md` for conventions.
    ```
 
 2. Every devcontainer built after that clones this repo to `~/claude-config`
-   and runs `install.sh`, which symlinks `skills/` into `~/.claude/skills` —
-   so every skill here just shows up, no per-project devcontainer edits.
+   and runs `install.sh`, which symlinks `skills/` into wherever Claude
+   Code looks for user-level skills — so every skill here just shows up,
+   no per-project devcontainer edits.
 
 To set it up manually on a machine without the dotfiles feature: clone this
 repo anywhere and run `./install.sh`.
+
+By default that's `~/.claude/skills`, but the actual location isn't always
+the same (Windows, WSL, and server setups can differ) — `install.sh`
+honors `CLAUDE_CONFIG_DIR` if it's set in your environment, same as
+Claude Code's own CLI, so set that first if your setup uses a
+non-default config directory.
 
 ## Skills
 
