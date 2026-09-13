@@ -48,3 +48,4 @@ non-default config directory.
 | [dsg-release-check](skills/dsg-release-check/SKILL.md) | Pre-release gate over everything since the last tag: version-bump consistency, changelog, API contract, full dependency audit, release-notes sanity. |
 | [dsg-version-check](skills/dsg-version-check/SKILL.md) | Check a version bump was applied consistently across every manifest/constant/label that declares it. |
 | [dsg-sonar](skills/dsg-sonar/SKILL.md) | Pull open SonarQube/SonarCloud issues for a branch or the whole project, dismiss genuine false positives, and fix the rest in reviewable batches via `TODO_TASKS.md`. |
+| [dsg-actions](skills/dsg-actions/SKILL.md) | Pull failing GitHub Actions runs via `gh`, isolate the actual error from the log, tell flaky/infra apart from real failures, and fix the real ones — no more copy-pasting logs into chat. |
