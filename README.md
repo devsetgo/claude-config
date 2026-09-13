@@ -43,7 +43,7 @@ non-default config directory.
 | [error-handling-check](skills/error-handling-check/SKILL.md) | Flag swallowed exceptions, inconsistent logging, and error responses that leak internals. |
 | [secrets-drift-check](skills/secrets-drift-check/SKILL.md) | Flag hardcoded secrets/config and drift between `.env.example` and env vars actually read by code. |
 | [changelog-check](skills/changelog-check/SKILL.md) | Keep `CHANGELOG.md` current for user-facing changes; N/A on repos where Release Drafter (or similar) already generates it. |
-| [commit-message](skills/commit-message/SKILL.md) | Draft a commit message/PR title that signals breaking vs feature vs fix, matching this repo's release automation. |
+| [commit-message](skills/commit-message/SKILL.md) | Draft a commit message/PR title (breaking vs feature vs fix) matching this repo's release automation, then create the commit; asks once per repo about AI co-author credit, and always asks before pushing. |
 | [api-contract-check](skills/api-contract-check/SKILL.md) | Classify API/schema changes as breaking or non-breaking (required vs optional, type changes, removals). |
 | [release-check](skills/release-check/SKILL.md) | Pre-release gate over everything since the last tag: version-bump consistency, changelog, API contract, full dependency audit, release-notes sanity. |
 | [version-bump-check](skills/version-bump-check/SKILL.md) | Check a version bump was applied consistently across every manifest/constant/label that declares it. |
