@@ -65,29 +65,36 @@ autolabeler:
 
 categories:
   - title: "Breaking Changes"
-    labels:
-      - "breaking"
+    when:
+      labels:
+        - "breaking"
   - title: "Features"
-    labels:
-      - "feature"
-      - "enhancement"
+    when:
+      labels:
+        - "feature"
+        - "enhancement"
   - title: "Bug Fixes"
-    labels:
-      - "bug"
-      - "fix"
+    when:
+      labels:
+        - "bug"
+        - "fix"
   - title: "Documentation"
-    labels:
-      - "docs"
+    when:
+      labels:
+        - "docs"
   - title: "Code Improvements"
-    labels:
-      - "code improvements"
+    when:
+      labels:
+        - "code improvements"
   - title: "GitHub Actions"
-    labels:
-      - "github actions"
+    when:
+      labels:
+        - "github actions"
   - title: "Maintenance"
-    labels:
-      - "chore"
-      - "dependencies"
+    when:
+      labels:
+        - "chore"
+        - "dependencies"
 
 change-template: "- $TITLE (#$NUMBER) (@$AUTHOR)"
 change-title-escapes: "<*_&"
