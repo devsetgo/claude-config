@@ -23,14 +23,14 @@ belongs in the target project's own `CLAUDE.md`, not here.
   for its Output section instead of restating the standalone-vs-delegated
   convention inline — link to it. If that convention changes, it should
   only need editing in one place.
-- An orchestrator skill (e.g. `pr-check`, `release-check`) delegates to
-  focused single-purpose skills rather than inlining their logic; only
-  keep a check inline when it's genuinely too small/project-specific to
-  reuse elsewhere (e.g. ignore-file hygiene).
+- An orchestrator skill (e.g. `dsg-pr-check`, `dsg-release-check`)
+  delegates to focused single-purpose skills rather than inlining their
+  logic; only keep a check inline when it's genuinely too
+  small/project-specific to reuse elsewhere (e.g. ignore-file hygiene).
 - Any skill that turns findings into a worklist — an orchestrator's FAIL
-  items (`pr-check`, `release-check`), or a backlog-working skill's open
-  items (`sonar-cleanup`) — writes to the single shared `TODO_TASKS.md`
-  (in the target repo, not this one). Follow
+  items (`dsg-pr-check`, `dsg-release-check`), or a backlog-working
+  skill's open items (`dsg-sonar`) — writes to the single shared
+  `TODO_TASKS.md` (in the target repo, not this one). Follow
   `skills/_shared/task-list.md`'s file/structure/cleanup convention rather
   than spawning a per-skill task file. Any new skill with a worklist added
   later should use the same file, not a new one.
@@ -59,7 +59,7 @@ belongs in the target project's own `CLAUDE.md`, not here.
   informational only, so don't publish the draft as a numbered release.
   PR titles in Conventional Commits style (`feat:`, `fix:`, `chore:`,
   etc.) get autolabeled correctly regardless of branch name; see the
-  `commit-message` skill for drafting those.
+  `dsg-commit` skill for drafting those.
 - Workflow: changes go on `dev`, opened as a PR into `main` (see
-  `pr-check`/`release-check` for the review gates to run against that
-  PR before merging).
+  `dsg-pr-check`/`dsg-release-check` for the review gates to run against
+  that PR before merging).

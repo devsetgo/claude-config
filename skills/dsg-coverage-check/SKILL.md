@@ -1,6 +1,6 @@
 ---
-name: test-coverage-check
-description: Identify test coverage gaps in changed code (not just overall percentage), ruling out dead code and unreachable branches first, prioritized by risk. Use standalone or as part of pr-check.
+name: dsg-coverage-check
+description: Identify test coverage gaps in changed code (not just overall percentage), ruling out dead code and unreachable branches first, prioritized by risk. Use standalone or as part of dsg-pr-check.
 ---
 
 # Test Coverage Check

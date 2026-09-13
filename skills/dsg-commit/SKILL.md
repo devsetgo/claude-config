@@ -1,5 +1,5 @@
 ---
-name: commit-message
+name: dsg-commit
 description: Draft a commit message and/or PR title that correctly signals breaking changes vs features vs fixes, matching whatever this repo's release automation (Release Drafter autolabeler, semantic-release, Conventional Commits) actually reads — then create the commit. Asks once per repo whether to credit the AI as co-author, and always asks before pushing. Use when preparing a commit or opening a PR.
 ---
 
@@ -53,7 +53,7 @@ without asking.
    - **Other** — chore/docs/refactor/test/ci, no user-facing effect.
 
    If the diff touches a public API/schema, this overlaps with
-   `api-contract-check` — defer to its breaking/non-breaking call when
+   `dsg-api-check` — defer to its breaking/non-breaking call when
    both are in play rather than reclassifying independently.
 
 5. Draft the message matching whichever convention step 2 determined,
@@ -65,7 +65,7 @@ without asking.
    body if that preference is `true` — it's a trailer on the commit
    message, not something that belongs in a PR title.
 
-6. If `changelog-check` determined this repo hand-maintains
+6. If `dsg-changelog-check` determined this repo hand-maintains
    `CHANGELOG.md` (no Release Drafter present), also draft an entry there
    in the same pass. Skip this when Release Drafter is present — it
    generates the changelog from this same PR/commit metadata, so a

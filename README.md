@@ -35,16 +35,16 @@ non-default config directory.
 
 | Skill | Description |
 | --- | --- |
-| [pr-check](skills/pr-check/SKILL.md) | Pre-PR standards gate over the current diff; runs the checks below plus security/migration/ignore-file checks, then writes failures to the shared `TODO_TASKS.md` worklist. |
-| [test-coverage-check](skills/test-coverage-check/SKILL.md) | Find test coverage gaps in changed code, ruling out dead code and unreachable branches, prioritized by risk. |
-| [doc-freshness-check](skills/doc-freshness-check/SKILL.md) | Check that new settings/endpoints/tables/behavior in a diff are reflected in the project's own docs. |
-| [comment-coverage-check](skills/comment-coverage-check/SKILL.md) | Flag changed functions with non-obvious logic and no "why" comment. |
-| [dependency-audit-check](skills/dependency-audit-check/SKILL.md) | Check diff-touched dependencies for known vulnerabilities, license conflicts, unused additions, and abandoned packages. |
-| [error-handling-check](skills/error-handling-check/SKILL.md) | Flag swallowed exceptions, inconsistent logging, and error responses that leak internals. |
-| [secrets-drift-check](skills/secrets-drift-check/SKILL.md) | Flag hardcoded secrets/config and drift between `.env.example` and env vars actually read by code. |
-| [changelog-check](skills/changelog-check/SKILL.md) | Keep `CHANGELOG.md` current for user-facing changes; N/A on repos where Release Drafter (or similar) already generates it. |
-| [commit-message](skills/commit-message/SKILL.md) | Draft a commit message/PR title (breaking vs feature vs fix) matching this repo's release automation, then create the commit; asks once per repo about AI co-author credit, and always asks before pushing. |
-| [api-contract-check](skills/api-contract-check/SKILL.md) | Classify API/schema changes as breaking or non-breaking (required vs optional, type changes, removals). |
-| [release-check](skills/release-check/SKILL.md) | Pre-release gate over everything since the last tag: version-bump consistency, changelog, API contract, full dependency audit, release-notes sanity. |
-| [version-bump-check](skills/version-bump-check/SKILL.md) | Check a version bump was applied consistently across every manifest/constant/label that declares it. |
-| [sonar-cleanup](skills/sonar-cleanup/SKILL.md) | Pull open SonarQube/SonarCloud issues for a branch or the whole project, dismiss genuine false positives, and fix the rest in reviewable batches via `TODO_TASKS.md`. |
+| [dsg-pr-check](skills/dsg-pr-check/SKILL.md) | Pre-PR standards gate over the current diff; runs the checks below plus security/migration/ignore-file checks, then writes failures to the shared `TODO_TASKS.md` worklist. |
+| [dsg-coverage-check](skills/dsg-coverage-check/SKILL.md) | Find test coverage gaps in changed code, ruling out dead code and unreachable branches, prioritized by risk. |
+| [dsg-doc-check](skills/dsg-doc-check/SKILL.md) | Check that new settings/endpoints/tables/behavior in a diff are reflected in the project's own docs. |
+| [dsg-comment-check](skills/dsg-comment-check/SKILL.md) | Flag changed functions with non-obvious logic and no "why" comment. |
+| [dsg-dep-check](skills/dsg-dep-check/SKILL.md) | Check diff-touched dependencies for known vulnerabilities, license conflicts, unused additions, and abandoned packages. |
+| [dsg-error-check](skills/dsg-error-check/SKILL.md) | Flag swallowed exceptions, inconsistent logging, and error responses that leak internals. |
+| [dsg-secrets-check](skills/dsg-secrets-check/SKILL.md) | Flag hardcoded secrets/config and drift between `.env.example` and env vars actually read by code. |
+| [dsg-changelog-check](skills/dsg-changelog-check/SKILL.md) | Keep `CHANGELOG.md` current for user-facing changes; N/A on repos where Release Drafter (or similar) already generates it. |
+| [dsg-commit](skills/dsg-commit/SKILL.md) | Draft a commit message/PR title (breaking vs feature vs fix) matching this repo's release automation, then create the commit; asks once per repo about AI co-author credit, and always asks before pushing. |
+| [dsg-api-check](skills/dsg-api-check/SKILL.md) | Classify API/schema changes as breaking or non-breaking (required vs optional, type changes, removals). |
+| [dsg-release-check](skills/dsg-release-check/SKILL.md) | Pre-release gate over everything since the last tag: version-bump consistency, changelog, API contract, full dependency audit, release-notes sanity. |
+| [dsg-version-check](skills/dsg-version-check/SKILL.md) | Check a version bump was applied consistently across every manifest/constant/label that declares it. |
+| [dsg-sonar](skills/dsg-sonar/SKILL.md) | Pull open SonarQube/SonarCloud issues for a branch or the whole project, dismiss genuine false positives, and fix the rest in reviewable batches via `TODO_TASKS.md`. |

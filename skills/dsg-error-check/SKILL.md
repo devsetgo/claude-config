@@ -1,6 +1,6 @@
 ---
-name: error-handling-check
-description: Check new/changed code for swallowed exceptions, inconsistent logging, and error responses that leak internals. Use standalone or as part of pr-check.
+name: dsg-error-check
+description: Check new/changed code for swallowed exceptions, inconsistent logging, and error responses that leak internals. Use standalone or as part of dsg-pr-check.
 ---
 
 # Error Handling Check

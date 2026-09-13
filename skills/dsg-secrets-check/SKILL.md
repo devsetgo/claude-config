@@ -1,6 +1,6 @@
 ---
-name: secrets-drift-check
-description: Check for hardcoded secrets/config in the diff and drift between the env-example file and the env vars actually read by code. Use standalone or as part of pr-check.
+name: dsg-secrets-check
+description: Check for hardcoded secrets/config in the diff and drift between the env-example file and the env vars actually read by code. Use standalone or as part of dsg-pr-check.
 ---
 
 # Secrets & Config Drift Check

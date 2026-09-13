@@ -1,5 +1,5 @@
 ---
-name: api-contract-check
+name: dsg-api-check
 description: Classify API/schema changes in the diff as breaking or non-breaking — required vs optional fields, type changes, removed/renamed fields or endpoints, changed defaults or validation. Use before opening a PR that touches a public API, schema, or library contract.
 ---
 
@@ -57,6 +57,6 @@ with: the symbol/field/endpoint, what changed, and who it affects. For
 (version the endpoint, add the field with a backward-compatible default,
 deprecate-then-remove over two releases). See
 `skills/_shared/finding-format.md` for the standalone-vs-delegated
-reporting convention (relevant callers include `pr-check`, `release-check`,
-and `commit-message` deciding whether a `!`/`BREAKING CHANGE` marker is
-warranted).
+reporting convention (relevant callers include `dsg-pr-check`,
+`dsg-release-check`, and `dsg-commit` deciding whether a `!`/
+`BREAKING CHANGE` marker is warranted).

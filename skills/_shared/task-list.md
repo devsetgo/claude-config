@@ -1,10 +1,10 @@
 # Shared task-list convention (TODO_TASKS.md)
 
 Used by every orchestrator skill in this repo that turns FAIL findings
-into a worklist (currently `pr-check` and `release-check`), so they share
-one file and one cleanup routine instead of each spawning its own. This is
-not a skill itself — it's a shared reference the orchestrators' Output
-sections point to.
+into a worklist (currently `dsg-pr-check` and `dsg-release-check`), so
+they share one file and one cleanup routine instead of each spawning its
+own. This is not a skill itself — it's a shared reference the
+orchestrators' Output sections point to.
 
 ## File
 
@@ -16,7 +16,7 @@ it's a local working file, not something meant to be committed.
 ## Structure
 
 Group items under category headings — the same category names the
-calling skill's own checklist uses (e.g. `pr-check`'s "Test coverage
+calling skill's own checklist uses (e.g. `dsg-pr-check`'s "Test coverage
 gaps", "Security"). Reuse an existing heading from a prior run instead of
 creating a duplicate one. Each item:
 
@@ -32,10 +32,10 @@ separate tracking file.
 # TODO Tasks
 
 ## Test coverage gaps
-- [ ] src/auth/session.py:42 — add a test for expired-token rejection (auth path, currently untested) [pr-check, 2026-09-12]
+- [ ] src/auth/session.py:42 — add a test for expired-token rejection (auth path, currently untested) [dsg-pr-check, 2026-09-12]
 
 ## Security
-- [ ] src/api/upload.py:18 — validate content-type before write (path traversal risk) [pr-check, 2026-09-12]
+- [ ] src/api/upload.py:18 — validate content-type before write (path traversal risk) [dsg-pr-check, 2026-09-12]
 ```
 
 ## Adding findings

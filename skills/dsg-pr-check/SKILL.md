@@ -1,6 +1,6 @@
 ---
-name: pr-check
-description: Run a pre-PR standards review — test coverage gaps, security, documentation freshness, comment quality, schema-migration coverage, ignore-file hygiene, dependency audit, error handling, secrets/config drift, changelog freshness, and API contract breakage. Use before opening a PR. For cutting an actual release, use `release-check` instead.
+name: dsg-pr-check
+description: Run a pre-PR standards review — test coverage gaps, security, documentation freshness, comment quality, schema-migration coverage, ignore-file hygiene, dependency audit, error handling, secrets/config drift, changelog freshness, and API contract breakage. Use before opening a PR. For cutting an actual release, use `dsg-release-check` instead.
 ---
 
 # PR Readiness Check
@@ -8,7 +8,7 @@ description: Run a pre-PR standards review — test coverage gaps, security, doc
 A standards gate to run before opening a PR, scoped to the current diff.
 For the separate moment of cutting a release — which should look at
 everything accumulated since the last tag, not just one diff — use the
-`release-check` skill instead. It combines delegated review (existing
+`dsg-release-check` skill instead. It combines delegated review (existing
 Claude Code skills) with a handful of checks that are typically
 project-specific. Report a pass/fail/n-a summary, then turn any failures
 into `TODO_TASKS.md` entries to work through one at a time. Don't fix
@@ -25,7 +25,7 @@ generic guidance below.
 
 ## Checklist
 
-1. **Test coverage gaps** — delegate to the `test-coverage-check` skill.
+1. **Test coverage gaps** — delegate to the `dsg-coverage-check` skill.
 
 2. **Security** — delegate to the `security-review` skill/command if
    available in this environment; otherwise perform a manual pass for the
@@ -36,9 +36,9 @@ generic guidance below.
    skill/command if available; otherwise review the diff directly for
    correctness bugs and obvious simplification opportunities.
 
-4. **Documentation freshness** — delegate to the `doc-freshness-check` skill.
+4. **Documentation freshness** — delegate to the `dsg-doc-check` skill.
 
-5. **Comment coverage** — delegate to the `comment-coverage-check` skill.
+5. **Comment coverage** — delegate to the `dsg-comment-check` skill.
 
 6. **Schema/migration coverage** — if this project uses a migration tool
    (Alembic, Django migrations, Prisma, etc.) and the diff changes a
@@ -52,21 +52,21 @@ generic guidance below.
    generated artifacts, local-only files, or secrets-adjacent files that
    `.gitignore`/`.dockerignore` don't yet cover.
 
-8. **Dependency audit** — delegate to the `dependency-audit-check` skill.
+8. **Dependency audit** — delegate to the `dsg-dep-check` skill.
 
-9. **Error handling** — delegate to the `error-handling-check` skill.
+9. **Error handling** — delegate to the `dsg-error-check` skill.
 
-10. **Secrets & config drift** — delegate to the `secrets-drift-check` skill.
+10. **Secrets & config drift** — delegate to the `dsg-secrets-check` skill.
 
-11. **Changelog freshness** — delegate to the `changelog-check` skill.
+11. **Changelog freshness** — delegate to the `dsg-changelog-check` skill.
     Expect `N/A` on repos using Release Drafter or similar automation;
     that's correct behavior, not a skipped check.
 
-12. **API contract breakage** — delegate to the `api-contract-check`
+12. **API contract breakage** — delegate to the `dsg-api-check`
     skill. `N/A` if the diff doesn't touch a public API/schema/library
     contract.
 
-Once the PR is ready to commit, use the separate `commit-message` skill
+Once the PR is ready to commit, use the separate `dsg-commit` skill
 to draft the commit message/PR title — it's a drafting step, not a
 pass/fail item, so it isn't part of this checklist.
 
@@ -79,7 +79,7 @@ not the task list file.
 Then merge findings into the shared `TODO_TASKS.md` worklist — see
 `skills/_shared/task-list.md` for the file location, structure, dedup
 rules, and the cleanup pass to run every time (including runs with zero
-new findings). Tag each item `[pr-check, <date>]` per that convention.
+new findings). Tag each item `[dsg-pr-check, <date>]` per that convention.
 
 After updating the file, stop — don't start fixing issues unless asked.
 Findings are meant to be worked through one at a time (with the user, or

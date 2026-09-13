@@ -1,5 +1,5 @@
 ---
-name: sonar-cleanup
+name: dsg-sonar
 description: Pull open SonarQube/SonarCloud issues for a branch or the whole project via the Sonar API, dismiss genuine false positives (with a recorded justification), and fix the rest in reviewable batches — keeping TODO_TASKS.md current on what's fixed vs remaining. Use to work through a Sonar issue backlog.
 ---
 
@@ -96,7 +96,7 @@ positives, where the flagged code intentionally stays as-is.
 Follow `skills/_shared/task-list.md` for the shared file, structure, and
 cleanup convention. A few things specific to this skill:
 
-- Tag each item `[sonar-cleanup, <date>]` and include the Sonar issue key
+- Tag each item `[dsg-sonar, <date>]` and include the Sonar issue key
   in the item text itself (e.g. `... (issue AbCd1234)`) — that key is
   what makes cleanup precise instead of guesswork.
 - Group items under `Sonar — Bugs`, `Sonar — Vulnerabilities`,

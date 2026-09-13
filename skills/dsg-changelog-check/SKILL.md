@@ -1,6 +1,6 @@
 ---
-name: changelog-check
-description: Keep CHANGELOG.md current for user-facing changes — skips repos where Release Drafter (or an equivalent release-notes action) already generates it from PR metadata. Use standalone after finishing a change, or as part of pr-check.
+name: dsg-changelog-check
+description: Keep CHANGELOG.md current for user-facing changes — skips repos where Release Drafter (or an equivalent release-notes action) already generates it from PR metadata. Use standalone after finishing a change, or as part of dsg-pr-check.
 ---
 
 # Changelog Check
@@ -22,7 +22,7 @@ tooling.
    tool was found. Optionally sanity-check that the tool's category
    config (e.g. Release Drafter's `autolabeler`/`categories`) actually
    lines up with the labels/title conventions this repo's PRs use — see
-   the `commit-message` skill for the drafting side of that.
+   the `dsg-commit` skill for the drafting side of that.
 
 2. If no changelog automation is found, look for `CHANGELOG.md` (or
    `HISTORY.md`, `docs/CHANGELOG.md`). If none exists, ask before creating
@@ -46,7 +46,7 @@ tooling.
   add the entries to `CHANGELOG.md` under its "Unreleased" section (or
   equivalent), matching its existing format. Flag anything ambiguous
   (e.g. which section a change belongs in) rather than guessing silently.
-- **Delegated from another skill** (e.g. `pr-check`): don't write to the
+- **Delegated from another skill** (e.g. `dsg-pr-check`): don't write to the
   file — return findings (what's missing, suggested entry text) so the
   caller can add them to its own task list instead.
 - **Release Drafter (or equivalent) present**: report `N/A` and which

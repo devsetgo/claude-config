@@ -1,6 +1,6 @@
 ---
-name: comment-coverage-check
-description: Spot-check new/changed functions for missing "why" comments on non-obvious logic — workarounds, invariants, hidden constraints — not "what" comments. Use standalone or as part of pr-check.
+name: dsg-comment-check
+description: Spot-check new/changed functions for missing "why" comments on non-obvious logic — workarounds, invariants, hidden constraints — not "what" comments. Use standalone or as part of dsg-pr-check.
 ---
 
 # Comment Coverage Check
