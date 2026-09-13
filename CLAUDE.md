@@ -60,6 +60,12 @@ belongs in the target project's own `CLAUDE.md`, not here.
   PR titles in Conventional Commits style (`feat:`, `fix:`, `chore:`,
   etc.) get autolabeled correctly regardless of branch name; see the
   `dsg-commit` skill for drafting those.
+- `.github/workflows/autofill-pr.yml` — generates a PR title (on
+  `opened` only) and description (on every push) via OpenAI, using the
+  `OPENAI_API_KEY` repo secret. Title generation is deliberately
+  `opened`-only so it doesn't fight with Release Drafter's title-based
+  autolabeler or overwrite a Conventional-Commits-style title `dsg-commit`
+  already drafted. No secret set = silent no-op, not a failure.
 - Workflow: changes go on `dev`, opened as a PR into `main` (see
   `dsg-pr-check`/`dsg-release-check` for the review gates to run against
   that PR before merging).
