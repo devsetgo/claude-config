@@ -35,7 +35,7 @@ non-default config directory.
 
 | Skill | Description |
 | --- | --- |
-| [pr-check](skills/pr-check/SKILL.md) | Pre-PR standards gate over the current diff; runs the checks below plus security/migration/ignore-file checks, then writes failures to a `PR_CHECK_TASKS.md` worklist. |
+| [pr-check](skills/pr-check/SKILL.md) | Pre-PR standards gate over the current diff; runs the checks below plus security/migration/ignore-file checks, then writes failures to the shared `TODO_TASKS.md` worklist. |
 | [test-coverage-check](skills/test-coverage-check/SKILL.md) | Find test coverage gaps in changed code, ruling out dead code and unreachable branches, prioritized by risk. |
 | [doc-freshness-check](skills/doc-freshness-check/SKILL.md) | Check that new settings/endpoints/tables/behavior in a diff are reflected in the project's own docs. |
 | [comment-coverage-check](skills/comment-coverage-check/SKILL.md) | Flag changed functions with non-obvious logic and no "why" comment. |
@@ -47,3 +47,4 @@ non-default config directory.
 | [api-contract-check](skills/api-contract-check/SKILL.md) | Classify API/schema changes as breaking or non-breaking (required vs optional, type changes, removals). |
 | [release-check](skills/release-check/SKILL.md) | Pre-release gate over everything since the last tag: version-bump consistency, changelog, API contract, full dependency audit, release-notes sanity. |
 | [version-bump-check](skills/version-bump-check/SKILL.md) | Check a version bump was applied consistently across every manifest/constant/label that declares it. |
+| [sonar-cleanup](skills/sonar-cleanup/SKILL.md) | Pull open SonarQube/SonarCloud issues for a branch or the whole project, dismiss genuine false positives, and fix the rest in reviewable batches via `TODO_TASKS.md`. |

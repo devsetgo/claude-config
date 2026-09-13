@@ -27,10 +27,12 @@ belongs in the target project's own `CLAUDE.md`, not here.
   focused single-purpose skills rather than inlining their logic; only
   keep a check inline when it's genuinely too small/project-specific to
   reuse elsewhere (e.g. ignore-file hygiene).
-- An orchestrator skill that turns FAIL findings into a worklist writes to
-  the single shared `TODO_TASKS.md` (in the target repo, not this one) —
-  follow `skills/_shared/task-list.md`'s file/structure/cleanup convention
-  rather than spawning a per-skill task file. Any new orchestrator added
+- Any skill that turns findings into a worklist — an orchestrator's FAIL
+  items (`pr-check`, `release-check`), or a backlog-working skill's open
+  items (`sonar-cleanup`) — writes to the single shared `TODO_TASKS.md`
+  (in the target repo, not this one). Follow
+  `skills/_shared/task-list.md`'s file/structure/cleanup convention rather
+  than spawning a per-skill task file. Any new skill with a worklist added
   later should use the same file, not a new one.
 
 ## Layout
