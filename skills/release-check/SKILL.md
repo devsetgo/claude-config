@@ -54,13 +54,11 @@ generic guidance here.
 Report each item as one line: `PASS` / `FAIL` / `N/A` plus a one-sentence
 reason, same convention as `pr-check`.
 
-On any FAIL, write findings to `RELEASE_CHECK_TASKS.md` in the repo root,
-following the same conventions as `pr-check`'s task list:
-- check `.gitignore` for an entry covering it and add one if missing
-- if a prior `RELEASE_CHECK_TASKS.md` exists with unchecked items, ask
-  whether to resume/append or regenerate fresh
-- one checkbox per concrete actionable item, grouped by category heading,
-  omitting categories with no findings
+On any FAIL, merge findings into the same shared `TODO_TASKS.md` worklist
+`pr-check` uses — see `skills/_shared/task-list.md` for the file
+location, structure, dedup rules, and the cleanup pass to run every time
+(including runs with zero new findings). Tag each item
+`[release-check, <date>]` per that convention.
 
 Don't fix anything automatically unless asked — this is a gate, not an
 auto-fixer. Once everything passes, drafting the actual release notes or

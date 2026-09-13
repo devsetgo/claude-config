@@ -27,6 +27,11 @@ belongs in the target project's own `CLAUDE.md`, not here.
   focused single-purpose skills rather than inlining their logic; only
   keep a check inline when it's genuinely too small/project-specific to
   reuse elsewhere (e.g. ignore-file hygiene).
+- An orchestrator skill that turns FAIL findings into a worklist writes to
+  the single shared `TODO_TASKS.md` (in the target repo, not this one) —
+  follow `skills/_shared/task-list.md`'s file/structure/cleanup convention
+  rather than spawning a per-skill task file. Any new orchestrator added
+  later should use the same file, not a new one.
 
 ## Layout
 

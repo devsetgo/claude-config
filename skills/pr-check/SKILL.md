@@ -11,8 +11,9 @@ everything accumulated since the last tag, not just one diff — use the
 `release-check` skill instead. It combines delegated review (existing
 Claude Code skills) with a handful of checks that are typically
 project-specific. Report a pass/fail/n-a summary, then turn any failures
-into a task list file to work through one at a time. Don't fix anything
-automatically unless asked; this produces a worklist, not an auto-fixer.
+into `TODO_TASKS.md` entries to work through one at a time. Don't fix
+anything automatically unless asked; this produces a worklist, not an
+auto-fixer.
 
 ## Before running any checks
 
@@ -75,33 +76,13 @@ First, report each of the 12 items as one line: `PASS` / `FAIL` / `N/A`
 plus a one-sentence reason. This summary is printed to the conversation,
 not the task list file.
 
-Then, if there's at least one FAIL, write those findings out as a task
-list to `PR_CHECK_TASKS.md` in the repo root:
+Then merge findings into the shared `TODO_TASKS.md` worklist — see
+`skills/_shared/task-list.md` for the file location, structure, dedup
+rules, and the cleanup pass to run every time (including runs with zero
+new findings). Tag each item `[pr-check, <date>]` per that convention.
 
-- Before the first write, check `.gitignore` for an entry covering
-  `PR_CHECK_TASKS.md`. If missing, add one — it's a local working file,
-  not something meant to be committed.
-- If `PR_CHECK_TASKS.md` already exists with unchecked (`- [ ]`) items,
-  ask whether to resume/append to it or regenerate fresh — don't silently
-  overwrite in-progress work.
-- Group items under the same category headings as the checklist; omit
-  categories with no findings.
-- One checkbox per concrete, independently actionable item — not one
-  checkbox per category. A category with 4 coverage gaps gets 4 boxes.
-- Each item: `- [ ] <file:line> — <concrete action> (<why it matters>)`.
-
-```markdown
-# PR Check Tasks — <date>
-
-## Test coverage gaps
-- [ ] src/auth/session.py:42 — add a test for expired-token rejection (auth path, currently untested)
-
-## Security
-- [ ] src/api/upload.py:18 — validate content-type before write (path traversal risk)
-```
-
-After writing the file, stop — don't start fixing issues unless asked.
-Findings are meant to be worked through one at a time (with the user, or in
-a follow-up turn): pick an item, fix it, re-run the relevant check to
-confirm, then check it off (`- [x]`). Don't batch-fix the whole list in one
-pass.
+After updating the file, stop — don't start fixing issues unless asked.
+Findings are meant to be worked through one at a time (with the user, or
+in a follow-up turn): pick an item, fix it, re-run the relevant check to
+confirm, then check it off (`- [x]`). Don't batch-fix the whole list in
+one pass.
