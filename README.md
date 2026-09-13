@@ -149,6 +149,24 @@ API, classifies genuine false positives with a recorded justification
 team's shared dashboard), and fixes real issues — bugs, vulnerabilities,
 code smells — in batches of roughly 10-15, testing after each.
 
+### Issue tracking
+
+**[dsg-issue-todo](skills/dsg-issue-todo/SKILL.md)** — converts unchecked
+`TODO_TASKS.md` entries into GitHub Issues via the `gh` CLI, grouped by
+category and severity (critical/high items get their own issue, medium/low
+items in the same category batch into one checklist issue). Always shows
+the proposed title, body, grouping, and labels and waits for confirmation
+before creating anything, since opening issues is visible to the whole
+team; matching labels are only ever attached if they already exist in the
+repo.
+
+**[dsg-issue-new](skills/dsg-issue-new/SKILL.md)** — turns a plan already
+worked out in conversation (a new feature, enhancement, or bug fix) into a
+single titled, labeled GitHub Issue with a detailed description drawn from
+that plan — same label-matching and mandatory-confirmation rules as
+`dsg-issue-todo`, but drafted directly from the conversation instead of a
+`TODO_TASKS.md` entry.
+
 ### Commit & release authoring
 
 **[dsg-commit](skills/dsg-commit/SKILL.md)** — drafts a commit message

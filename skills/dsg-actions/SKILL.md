@@ -81,10 +81,13 @@ fix, reproduce locally, then move to the next batch.
 Follow `skills/_shared/task-list.md` for the shared file, structure, and
 cleanup convention. Specifics for this skill:
 
-- Tag each item `[dsg-actions, <date>]` and include the run/job ID in the
-  item text (e.g. `... (run 123456789, job "test")`).
+- Tag each item `[dsg-actions, <date>, <severity>]` and include the
+  run/job ID in the item text (e.g. `... (run 123456789, job "test")`).
 - Group items under `CI — Flaky/Infra (re-run only)`, `CI — Test
-  Failures`, `CI — Lint/Type Errors`, and `CI — Build Errors`.
+  Failures`, `CI — Lint/Type Errors`, and `CI — Build Errors`. Severity
+  follows the category: `Build Errors` and `Test Failures` → `high` (they
+  block merge), `Lint/Type Errors` → `medium`, `Flaky/Infra` → `low` (no
+  code fix needed, just a re-run).
 - Cleanup pass: re-check whether the latest run for that branch/workflow
   now succeeds (`gh run list --branch <branch> --workflow <name> --limit
   1 --json conclusion`); if it's green, remove the item — that's a more

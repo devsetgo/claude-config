@@ -58,7 +58,8 @@ On any FAIL, merge findings into the same shared `TODO_TASKS.md` worklist
 `dsg-pr-check` uses — see `skills/_shared/task-list.md` for the file
 location, structure, dedup rules, and the cleanup pass to run every time
 (including runs with zero new findings). Tag each item
-`[dsg-release-check, <date>]` per that convention.
+`[dsg-release-check, <date>, <severity>]` per that convention, using the
+same severity defaults `dsg-pr-check` uses.
 
 Don't fix anything automatically unless asked — this is a gate, not an
 auto-fixer. Once everything passes, drafting the actual release notes or

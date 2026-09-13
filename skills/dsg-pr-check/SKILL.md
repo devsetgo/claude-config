@@ -79,7 +79,13 @@ not the task list file.
 Then merge findings into the shared `TODO_TASKS.md` worklist — see
 `skills/_shared/task-list.md` for the file location, structure, dedup
 rules, and the cleanup pass to run every time (including runs with zero
-new findings). Tag each item `[dsg-pr-check, <date>]` per that convention.
+new findings). Tag each item `[dsg-pr-check, <date>, <severity>]` per that
+convention. Defer to a delegated check's own severity call when it makes
+one (e.g. `dsg-dep-check`'s vulnerability severity, `dsg-api-check`'s
+breaking/non-breaking classification); otherwise default by kind:
+secrets/security findings → `critical`, broken functionality or a breaking
+contract change → `high`, missing test coverage or error-handling gaps →
+`medium`, docs/comments/ignore-file hygiene → `low`.
 
 After updating the file, stop — don't start fixing issues unless asked.
 Findings are meant to be worked through one at a time (with the user, or
