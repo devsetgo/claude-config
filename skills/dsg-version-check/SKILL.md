@@ -1,5 +1,5 @@
 ---
-name: version-bump-check
+name: dsg-version-check
 description: Check that a version bump is applied consistently across every place this project declares its version — manifests, source constants, Docker/Helm labels, API specs. Recognizes BumpCalver (CalVer) config as the source of truth when present. Use when cutting a release, or standalone whenever a diff touches a version string.
 ---
 
@@ -36,7 +36,7 @@ version-declaration sites instead of guessing manifest locations:
   count (per `version_format`/`date_format`), not a major.minor.patch
   bump. Don't apply semver-shaped expectations (e.g. "a breaking change
   needs a major-version bump") to it elsewhere in a review — see
-  `release-check`'s note on this.
+  `dsg-release-check`'s note on this.
 
 If no BumpCalver config is found, fall back to the generic sweep below.
 

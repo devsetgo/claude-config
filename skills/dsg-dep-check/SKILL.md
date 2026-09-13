@@ -1,6 +1,6 @@
 ---
-name: dependency-audit-check
-description: Check dependencies changed in the diff for known vulnerabilities, license conflicts, unused additions, and abandoned packages. Use standalone or as part of pr-check.
+name: dsg-dep-check
+description: Check dependencies changed in the diff for known vulnerabilities, license conflicts, unused additions, and abandoned packages. Use standalone or as part of dsg-pr-check.
 ---
 
 # Dependency Audit Check

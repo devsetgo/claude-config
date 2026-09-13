@@ -1,6 +1,6 @@
 ---
-name: doc-freshness-check
-description: Check whether new settings, endpoints, tables, or behavior changes in the diff are reflected in this project's own standards docs. Use standalone or as part of pr-check.
+name: dsg-doc-check
+description: Check whether new settings, endpoints, tables, or behavior changes in the diff are reflected in this project's own standards docs. Use standalone or as part of dsg-pr-check.
 ---
 
 # Documentation Freshness Check
