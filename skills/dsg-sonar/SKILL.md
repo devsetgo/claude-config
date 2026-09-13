@@ -30,6 +30,30 @@ branch's baseline instead of silently returning nothing.
    variable name). Never print the token or write it to a file; if it's
    missing, ask the user to export it rather than trying to source it
    yourself from anywhere.
+
+   If it's missing, walk the user through getting one before going any
+   further — don't just say "set SONAR_TOKEN" and stop:
+   - **Generate a token**: in the Sonar UI, under the user's own account —
+     **My Account → Security** (same path on SonarCloud and self-hosted
+     SonarQube) — name it something identifiable (e.g. the project or
+     "claude-code"), and set an expiry if the org's policy expects one.
+     A token needs at least browse/read access to the project this skill
+     is targeting; it only needs write access too if the user wants this
+     skill to dismiss false positives (`Administer Issues` permission) —
+     mention that distinction rather than assuming they want the broader
+     scope.
+   - **Where to put it, locally**: export it as `SONAR_TOKEN` in the
+     shell — a `.env`/`.envrc` the project already loads if it has one,
+     otherwise the user's own shell profile. Never suggest committing it
+     to a tracked file or hardcoding it into `sonar-project.properties`.
+   - **Where to put it, for CI**: as a repository/organization secret
+     named to match whatever the CI workflow already reads (check
+     `.github/workflows/*.yml` for the env var name it expects — often
+     `SONAR_TOKEN`) — e.g. GitHub: repo **Settings → Secrets and
+     variables → Actions**. Only mention this path if the user's asking
+     about CI failing, not local runs of this skill.
+   - Once they've exported it in the current shell, re-check for it
+     rather than asking them to restart or re-invoke the skill.
 3. Determine the host: `https://sonarcloud.io` unless
    `sonar.host.url` says otherwise (self-hosted SonarQube). SonarCloud
    requests need an `organization` param; self-hosted requests don't.
@@ -96,9 +120,13 @@ positives, where the flagged code intentionally stays as-is.
 Follow `skills/_shared/task-list.md` for the shared file, structure, and
 cleanup convention. A few things specific to this skill:
 
-- Tag each item `[dsg-sonar, <date>]` and include the Sonar issue key
-  in the item text itself (e.g. `... (issue AbCd1234)`) — that key is
-  what makes cleanup precise instead of guesswork.
+- Tag each item `[dsg-sonar, <date>, <severity>]` and include the Sonar
+  issue key in the item text itself (e.g. `... (issue AbCd1234)`) — that
+  key is what makes cleanup precise instead of guesswork.
+- Map Sonar's own severity straight onto the shared scale: `BLOCKER`/
+  `CRITICAL` → `critical`, `MAJOR` → `high`, `MINOR` → `medium`, `INFO` →
+  `low`. For hotspots (no severity field), use the hotspot's own
+  vulnerability probability (`HIGH`/`MEDIUM`/`LOW`) directly as the tier.
 - Group items under `Sonar — Bugs`, `Sonar — Vulnerabilities`,
   `Sonar — Code Smells`, and `Sonar — Security Hotspots` headings.
 - Cleanup pass: instead of re-grepping code like the generic convention

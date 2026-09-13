@@ -1,10 +1,9 @@
 # Shared task-list convention (TODO_TASKS.md)
 
-Used by every orchestrator skill in this repo that turns FAIL findings
-into a worklist (currently `dsg-pr-check` and `dsg-release-check`), so
+Used by every skill in this repo that turns findings into a worklist, so
 they share one file and one cleanup routine instead of each spawning its
-own. This is not a skill itself — it's a shared reference the
-orchestrators' Output sections point to.
+own. This is not a skill itself — it's a shared reference those skills'
+Output sections point to.
 
 ## File
 
@@ -21,22 +20,33 @@ gaps", "Security"). Reuse an existing heading from a prior run instead of
 creating a duplicate one. Each item:
 
 ```markdown
-- [ ] <file:line> — <concrete action> (<why it matters>) [<skill-name>, <YYYY-MM-DD>]
+- [ ] <file:line> — <concrete action> (<why it matters>) [<skill-name>, <YYYY-MM-DD>, <severity>]
 ```
 
-The trailing `[skill-name, date]` tag records where and when the finding
-came from — it's what makes the cleanup pass below possible without a
-separate tracking file.
+The trailing `[skill-name, date, severity]` tag records where, when, and
+how bad the finding is — it's what makes the cleanup pass below possible
+without a separate tracking file, and what a skill like `dsg-issue-todo` needs
+to group items sensibly when turning them into GitHub Issues.
 
 ```markdown
 # TODO Tasks
 
 ## Test coverage gaps
-- [ ] src/auth/session.py:42 — add a test for expired-token rejection (auth path, currently untested) [dsg-pr-check, 2026-09-12]
+- [ ] src/auth/session.py:42 — add a test for expired-token rejection (auth path, currently untested) [dsg-pr-check, 2026-09-12, medium]
 
 ## Security
-- [ ] src/api/upload.py:18 — validate content-type before write (path traversal risk) [dsg-pr-check, 2026-09-12]
+- [ ] src/api/upload.py:18 — validate content-type before write (path traversal risk) [dsg-pr-check, 2026-09-12, critical]
 ```
+
+## Severity
+
+Four tiers: `critical`, `high`, `medium`, `low`. Judge it by impact if left
+unfixed (security exposure, data loss, broken functionality, breaking a
+contract), never by how much effort the fix takes. Each writer skill's own
+"Keeping TODO_TASKS.md current" section says how it maps its findings onto
+these four tiers. If a finding's severity changes on a later run (e.g. a
+re-classification), update the existing item's tag in place rather than
+adding a second entry for it.
 
 ## Adding findings
 
