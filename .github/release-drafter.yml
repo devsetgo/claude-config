@@ -1,11 +1,11 @@
 # Configuration for release-drafter/release-drafter
 # This file must live in the default branch at: .github/release-drafter.yml
 #
-# Release Drafter keeps a running, categorized draft of merged PRs. The
-# Release workflow (.github/workflows/release.yml) publishes it under a
-# BumpCalver CalVer tag (YYYY.MM.DD.N), passing the version, tag, and name
-# itself -- so the SemVer-oriented version/tag templates here aren't used.
-# Publish only through that workflow, never by hand from the Releases tab.
+# Release Drafter keeps a running, categorized draft of merged PRs. To
+# release, merge a "Prepare release" PR that bumps VERSION with BumpCalver
+# (YYYY.MM.DD.N), then publish this draft from the Releases tab with that
+# exact version as its tag. The SemVer-oriented version/tag templates here
+# aren't used.
 
 name-template: "Release Notes (Draft)"
 

@@ -28,7 +28,7 @@ working copy, so never discard, stash, or rewrite anything in it.
      report that and stop.
    - Read the version on each side: `git show HEAD:VERSION` and `git show
      origin/<default>:VERSION`. These are CalVer `YYYY.MM.DD.N` versions
-     cut by the repo's Release workflow. If either is missing, the clone
+     bumped in the repo's "Prepare release" PRs. If either is missing, the clone
      predates releases.
    - Count ahead/behind with `git rev-list --left-right --count
      HEAD...origin/<default>`.

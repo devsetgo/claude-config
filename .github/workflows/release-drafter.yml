@@ -21,17 +21,7 @@ jobs:
       pull-requests: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      # Without a baseline, v7 finds no changes until a release is
-      # published (see release_baseline.sh).
-      - name: Find comparison baseline
-        id: baseline
-        run: echo "from=$(.github/scripts/release_baseline.sh)" >> "$GITHUB_OUTPUT"
       - uses: release-drafter/release-drafter@v7.10.0
-        with:
-          from: ${{ steps.baseline.outputs.from }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

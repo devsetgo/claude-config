@@ -1,13 +1,13 @@
 # BumpCalver (https://github.com/devsetgo/bumpcalver) config for this
-# repo's releases: YYYY.MM.DD.N, where N counts releases cut that UTC day
-# (resets to 1 each day). Tags are the bare version (e.g. 2026.11.07.1).
-# Run by .github/workflows/release.yml -- not by hand -- so every release
-# is pushed and published the same way.
+# repo's releases: YYYY.MM.DD.N, where N counts releases that UTC day
+# (resets to 1 each day). Run `bumpcalver --build` in a "Prepare release"
+# PR. It only rewrites VERSION; the tag is created when the Release
+# Drafter draft is published with that version as its tag.
 version_format = "{current_date}.{build_count}"
 date_format = "%Y.%m.%d"
 timezone = "UTC"
-git_tag = true
-auto_commit = true
+git_tag = false
+auto_commit = false
 
 [[file]]
 path = "VERSION"

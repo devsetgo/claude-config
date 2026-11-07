@@ -92,8 +92,7 @@ belongs in the target project's own `CLAUDE.md`, not here.
   tasks-context hook against sample `TODO_TASKS.md` files.
 - `.github/workflows/release-drafter.yml` +
   `.github/release-drafter.yml` — drafts a categorized changelog from
-  merged PRs, visible in the GitHub Releases tab. Don't publish the draft
-  by hand; the Release workflow below does that.
+  merged PRs, visible in the GitHub Releases tab.
   PR titles in Conventional Commits style (`feat:`, `fix:`, `chore:`,
   etc.) get autolabeled correctly regardless of branch name; see the
   `dsg-commit` skill for drafting those. Since Release Drafter v7 the
@@ -102,19 +101,19 @@ belongs in the target project's own `CLAUDE.md`, not here.
   relabels); the drafter job only runs on push to `main`. Keep the
   `title:` autolabeler rules — PRs here come from `dev`, so `branch:`
   rules alone never match.
-- `.github/workflows/release.yml` — manual (`workflow_dispatch`, `main`
-  only) release: BumpCalver bumps `VERSION` to `YYYY.MM.DD.N` (the build
-  number counts releases that UTC day; see `bumpcalver.toml`), commits and
-  tags it (bare tag, no `v`), pushes, and publishes Release Drafter's draft
-  under that tag. Both release workflows pass Release Drafter an explicit
-  `from` baseline (`.github/scripts/release_baseline.sh`: the newest
-  CalVer tag, or the first commit before any release), because v7 finds
-  no changes at all without a published release. Versioning is CalVer via BumpCalver, never SemVer.
-  Releases mark batches; clones still track `main` itself (dotfiles always
-  clones the branch), and the `dsg-update` hook announces only a new
-  release once `VERSION` exists. Never edit `VERSION` or create release
-  tags by hand. Run `dsg-release-check` before cutting one. After a release,
-  fast-forward `dev` to `main`, since the bump commit lands on `main`.
+- Releases follow the same flow as the other devsetgo projects, with no
+  release workflow. Versioning is CalVer via BumpCalver (`YYYY.MM.DD.N`;
+  the build number counts releases that UTC day), never SemVer.
+  1. Run `dsg-release-check`.
+  2. On `dev`, run `bumpcalver --build`. It only rewrites `VERSION`.
+  3. Merge that as a "Prepare release `<version>`" PR.
+  4. Publish the Release Drafter draft with exactly that version as its
+     tag. The tag is bare, with no `v`, and must match `VERSION`, because
+     the `dsg-update` hook and skill compare `VERSION` and look up
+     release notes by tag.
+
+  Releases mark batches; clones still track `main` itself (dotfiles
+  always clones the branch).
 - `.github/workflows/autofill-pr.yml` — runs `devsetgo/ai-pr-assistant`
   (OpenAI, `OPENAI_API_KEY` repo secret) to fill in PR descriptions
   ("smart": keeps a good one, extends or replaces a thin one), titles,
