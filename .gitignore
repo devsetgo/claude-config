@@ -220,3 +220,7 @@ __marimo__/
 # Claude Code writes account-synced skills to ~/.claude/skills/synced/,
 # which lands here through install.sh's skills/ symlink.
 skills/synced/
+
+# BumpCalver's local undo history (backups of bumped files, operation log).
+.bumpcalver/
+bumpcalver-history.json
