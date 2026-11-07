@@ -37,6 +37,12 @@ jobs:
           python-version: "3.x"
       - run: pip install bumpcalver==2026.10.18.1
 
+      # Before the bump creates the new tag: the previous release, or the
+      # first commit for the very first release (see release_baseline.sh).
+      - name: Find comparison baseline
+        id: baseline
+        run: echo "from=$(.github/scripts/release_baseline.sh)" >> "$GITHUB_OUTPUT"
+
       - name: Bump VERSION, commit, and tag
         id: bump
         run: |
@@ -59,6 +65,7 @@ jobs:
           tag: ${{ steps.bump.outputs.version }}
           name: ${{ steps.bump.outputs.version }}
           commitish: ${{ steps.bump.outputs.sha }}
+          from: ${{ steps.baseline.outputs.from }}
           publish: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
