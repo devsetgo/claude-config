@@ -71,6 +71,32 @@ new_upstream_commit four
 sleep 1
 [ "$(git -C "$WORK/clone" rev-parse origin/main)" = "$want" ] || fail "fetched despite fresh stamp"
 
+upstream_version() {
+  echo "$1" > "$WORK/seed/VERSION"
+  git -C "$WORK/seed" add VERSION
+  g "$WORK/seed" commit -m "Bump version to $1"
+  g "$WORK/seed" push origin main
+}
+
+echo "== once releases exist: untagged commits since your release are silent"
+upstream_version 2026.11.07.1
+g "$WORK/clone" fetch origin
+g "$WORK/clone" merge --ff-only origin/main
+new_upstream_commit five
+g "$WORK/clone" fetch origin
+touch "$STAMP"
+[ -z "$("$HOOK")" ] || fail "announced untagged commits after a release"
+
+echo "== a newer release is announced with both versions"
+upstream_version 2026.11.07.2
+g "$WORK/clone" fetch origin
+out="$("$HOOK")"
+python3 - "$out" <<'PY' || fail "bad release notice: $out"
+import json, sys
+d = json.loads(sys.argv[1])
+assert "claude-config 2026.11.07.2 is available (you have 2026.11.07.1)" in d["systemMessage"], d
+PY
+
 echo "== unreachable remote: exits 0 without blocking"
 git -C "$WORK/clone" remote set-url origin "$WORK/missing.git"
 rm -f "$STAMP"

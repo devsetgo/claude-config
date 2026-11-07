@@ -45,7 +45,9 @@ links — move it aside and re-run.
 is left alone). The first is the update check: when the clone is on its default branch and behind its
 remote, new sessions show a one-line notice suggesting
 `/dsg-update`, which fast-forwards the clone and re-runs
-`install.sh`. The hook never delays a session: it compares local refs,
+`install.sh`. Once releases exist, the notice waits for a new release
+(`claude-config 2026.11.07.2 is available (you have 2026.11.07.1)`)
+rather than firing on every merge. The hook never delays a session: it compares local refs,
 and refreshes them with a background `git fetch` at most once a day
 (`DSG_UPDATE_CHECK_HOURS` to change that). It stays quiet on
 other branches, so it doesn't nag while you're developing here.
@@ -61,6 +63,17 @@ To opt out of either, re-run `install.sh` with `DSG_UPDATE_NO_CHECK=1`
 or `DSG_TASKS_NO_CONTEXT=1` set (which removes that hook), or set the
 variable in your environment. Registering hooks needs `python3`; without
 it, `install.sh` warns and installs everything else.
+
+## Releases
+
+Releases use calendar versioning via
+[BumpCalver](https://github.com/devsetgo/bumpcalver): `YYYY.MM.DD.N`,
+where `N` counts releases cut that UTC day. The current version is in
+[VERSION](VERSION). To cut one, run the **Release** workflow on `main`
+from the Actions tab (or `gh workflow run release.yml --ref main`). It
+bumps `VERSION`, tags it, and publishes Release Drafter's accumulated
+notes under that tag. Clones keep tracking `main`; a release just marks
+a batch worth announcing.
 
 ## Global rules
 
