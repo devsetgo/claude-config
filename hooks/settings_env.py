@@ -13,6 +13,9 @@ import json
 import os
 import sys
 
+# Importing settings_hook would otherwise leave a __pycache__ in hooks/,
+# which is the live clone every machine runs from.
+sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from settings_hook import Unreadable, load, save  # noqa: E402
 
