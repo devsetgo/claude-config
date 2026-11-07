@@ -63,8 +63,13 @@ autolabeler:
     title:
       - '/^(deps?|bump)(\(.+\))?:/'
 
+# exclusive: a PR lands only in the first category it matches, in this
+# order, so a PR carrying several labels (e.g. bug + docs + github actions
+# from the autolabeler and ai-pr-assistant) is listed once, under its most
+# significant kind of change.
 categories:
   - title: "Breaking Changes"
+    exclusive: true
     when:
       labels:
         - "breaking"
@@ -72,28 +77,34 @@ categories:
         - "breaking-change"
         - "Breaking Change"
   - title: "Features"
+    exclusive: true
     when:
       labels:
         - "feature"
         - "enhancement"
   - title: "Bug Fixes"
+    exclusive: true
     when:
       labels:
         - "bug"
         - "fix"
   - title: "Documentation"
+    exclusive: true
     when:
       labels:
         - "docs"
   - title: "Code Improvements"
+    exclusive: true
     when:
       labels:
         - "code improvements"
   - title: "GitHub Actions"
+    exclusive: true
     when:
       labels:
         - "github actions"
   - title: "Maintenance"
+    exclusive: true
     when:
       labels:
         - "chore"
