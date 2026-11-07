@@ -41,7 +41,7 @@ fi
 behind="$(git_ rev-list --count "HEAD..refs/remotes/origin/$default")" || exit 0
 [ "${behind:-0}" -gt 0 ] 2>/dev/null || exit 0
 
-# Releases (VERSION, bumped by the Release workflow) batch the notice: when
+# Releases (VERSION, bumped in a "Prepare release" PR) batch the notice: when
 # the remote has a VERSION file, only a new release is announced, not every
 # merge since yours. Without one (before the first release), fall back to
 # counting commits.

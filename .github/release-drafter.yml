@@ -1,11 +1,11 @@
 # Configuration for release-drafter/release-drafter
 # This file must live in the default branch at: .github/release-drafter.yml
 #
-# Release Drafter keeps a running, categorized draft of merged PRs. The
-# Release workflow (.github/workflows/release.yml) publishes it under a
-# BumpCalver CalVer tag (YYYY.MM.DD.N), passing the version, tag, and name
-# itself -- so the SemVer-oriented version/tag templates here aren't used.
-# Publish only through that workflow, never by hand from the Releases tab.
+# Release Drafter keeps a running, categorized draft of merged PRs. To
+# release, merge a "Prepare release" PR that bumps VERSION with BumpCalver
+# (YYYY.MM.DD.N), then publish this draft from the Releases tab with that
+# exact version as its tag. The SemVer-oriented version/tag templates here
+# aren't used.
 
 name-template: "Release Notes (Draft)"
 
@@ -63,8 +63,13 @@ autolabeler:
     title:
       - '/^(deps?|bump)(\(.+\))?:/'
 
+# exclusive: a PR lands only in the first category it matches, in this
+# order, so a PR carrying several labels (e.g. bug + docs + github actions
+# from the autolabeler and ai-pr-assistant) is listed once, under its most
+# significant kind of change.
 categories:
   - title: "Breaking Changes"
+    exclusive: true
     when:
       labels:
         - "breaking"
@@ -72,28 +77,34 @@ categories:
         - "breaking-change"
         - "Breaking Change"
   - title: "Features"
+    exclusive: true
     when:
       labels:
         - "feature"
         - "enhancement"
   - title: "Bug Fixes"
+    exclusive: true
     when:
       labels:
         - "bug"
         - "fix"
   - title: "Documentation"
+    exclusive: true
     when:
       labels:
         - "docs"
   - title: "Code Improvements"
+    exclusive: true
     when:
       labels:
         - "code improvements"
   - title: "GitHub Actions"
+    exclusive: true
     when:
       labels:
         - "github actions"
   - title: "Maintenance"
+    exclusive: true
     when:
       labels:
         - "chore"

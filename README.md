@@ -69,11 +69,15 @@ it, `install.sh` warns and installs everything else.
 Releases use calendar versioning via
 [BumpCalver](https://github.com/devsetgo/bumpcalver): `YYYY.MM.DD.N`,
 where `N` counts releases cut that UTC day. The current version is in
-[VERSION](VERSION). To cut one, run the **Release** workflow on `main`
-from the Actions tab (or `gh workflow run release.yml --ref main`). It
-bumps `VERSION`, tags it, and publishes Release Drafter's accumulated
-notes under that tag. Clones keep tracking `main`; a release just marks
-a batch worth announcing.
+[VERSION](VERSION). To cut one:
+
+1. On `dev`, run `bumpcalver --build`. It only rewrites `VERSION`.
+2. Open and merge it as a "Prepare release `<version>`" PR.
+3. Publish the Release Drafter draft from the Releases tab, with that
+   exact version as the tag.
+
+Clones keep tracking `main`; a release marks a batch worth announcing.
+The update notice fires once the bumped `VERSION` reaches `main`.
 
 ## Global rules
 
