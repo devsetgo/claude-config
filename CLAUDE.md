@@ -51,14 +51,24 @@ belongs in the target project's own `CLAUDE.md`, not here.
 - `agents/` — reusable subagent definitions, if/when added.
 - `global/rules/` — every-project instruction files, symlinked to
   `~/.claude/rules/` by `install.sh`.
+- `hooks/` — SessionStart hooks `install.sh` registers in the user's
+  `settings.json`: `dsg-update-check.sh` (reports when the clone is
+  behind, suggesting `dsg-update`) and `dsg-tasks-context.sh` (loads
+  `TODO_TASKS.md`'s `## In progress` section). `settings_hook.py` merges
+  one entry per script into `settings.json`. Hooks must never block or
+  fail a session: keep network calls in detached background jobs, and
+  keep output small, because it lands in every session's context.
 - `install.sh` — symlinks `skills/` to `~/.claude/skills` and
-  `global/rules/` to `~/.claude/rules`; this is what
+  `global/rules/` to `~/.claude/rules`, and registers the hooks above;
+  this is what
   actually makes the "pulled in via VS Code's dotfiles feature" claim in
   `README.md` true. Never make it copy files instead of symlinking — the
   whole point is that a `git pull` here updates every devcontainer with
   no reinstall step. `skills/synced/` is gitignored: Claude Code writes
   account-synced skills to `~/.claude/skills/synced/`, which lands in the
-  repo through that symlink.
+  repo through that symlink. `DSG_SHARED_CLAUDE_DIR=1` (set by a
+  devcontainer that mounts the host's config dir, see `dsg-devcontainer`)
+  makes `install.sh` a no-op so it can't re-point the host's links.
 
 ## Repo automation
 
@@ -67,7 +77,10 @@ belongs in the target project's own `CLAUDE.md`, not here.
   `README.md`'s skill table stays in sync with what's under `skills/`.
   Also runs `.github/scripts/test_install.sh`, which exercises
   `install.sh` against throwaway HOMEs (fresh, re-run, repoint, conflict,
-  `CLAUDE_CONFIG_DIR`).
+  `CLAUDE_CONFIG_DIR`, settings.json hook merge), and
+  `test_dsg_update_check.sh`, which runs the dsg-update hook against a
+  throwaway origin/clone, and `test_dsg_tasks_context.sh`, which runs the
+  tasks-context hook against sample `TODO_TASKS.md` files.
 - `.github/workflows/release-drafter.yml` +
   `.github/release-drafter.yml` — drafts a categorized changelog from
   merged PRs, visible in the GitHub Releases tab. This repo doesn't tag

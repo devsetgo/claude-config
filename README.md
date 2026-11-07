@@ -38,6 +38,30 @@ anything. If a target already exists as a real file or directory,
 `install.sh` leaves it alone, reports it, and still installs the other
 links — move it aside and re-run.
 
+## Staying up to date
+
+`install.sh` also registers two `SessionStart` hooks in
+`~/.claude/settings.json` (merging one entry each; the rest of the file
+is left alone). The first is the update check: when the clone is on its default branch and behind its
+remote, new sessions show a one-line notice suggesting
+`/dsg-update`, which fast-forwards the clone and re-runs
+`install.sh`. The hook never delays a session: it compares local refs,
+and refreshes them with a background `git fetch` at most once a day
+(`DSG_UPDATE_CHECK_HOURS` to change that). It stays quiet on
+other branches, so it doesn't nag while you're developing here.
+
+The second, `dsg-tasks-context`, loads the `## In progress` section of
+the project's `TODO_TASKS.md` (only that section, capped at 80 lines)
+into every session, including after `/clear` and compaction, so unfinished
+work carries across sessions and devcontainer rebuilds. It's silent when
+there's no such section. The [in-progress](global/rules/in-progress.md)
+rule tells Claude to keep that section current.
+
+To opt out of either, re-run `install.sh` with `DSG_UPDATE_NO_CHECK=1`
+or `DSG_TASKS_NO_CONTEXT=1` set (which removes that hook), or set the
+variable in your environment. Registering hooks needs `python3`; without
+it, `install.sh` warns and installs everything else.
+
 ## Global rules
 
 Files in [global/rules/](global/rules/) load into every Claude Code
@@ -49,6 +73,10 @@ short and generic. Start a new session after installing, then run
 - **[task-routing](global/rules/task-routing.md)** — when to work inline,
   delegate to a cheaper fresh sub-agent, or fork, sized by how long the
   work's output would sit in the main context.
+- **[in-progress](global/rules/in-progress.md)** — keep the plan,
+  decisions, and next step for unfinished work under `## In progress` in
+  `TODO_TASKS.md`, which the `dsg-tasks-context` hook loads at session
+  start.
 
 ## Skills
 
@@ -185,6 +213,28 @@ single titled, labeled GitHub Issue with a detailed description drawn from
 that plan — same label-matching and mandatory-confirmation rules as
 `dsg-issue-todo`, but drafted directly from the conversation instead of a
 `TODO_TASKS.md` entry.
+
+### Config maintenance
+
+**[dsg-update](skills/dsg-update/SKILL.md)** — updates
+this machine's claude-config clone: finds it through the installed
+skills symlink, summarizes what's new upstream (commits, plus skills,
+rules, and installer changes), fast-forwards only when the clone is
+clean and on its default branch, then re-runs `install.sh` and
+`install.sh --check`. Never stashes, resets, or switches branches; it
+reports instead. Suggested automatically by the dsg-update hook (see
+[Staying up to date](#staying-up-to-date)).
+
+**[dsg-devcontainer](skills/dsg-devcontainer/SKILL.md)** — sets up a
+project's devcontainer to share the host's Claude Code data, so memory,
+transcripts, settings, and login survive rebuilds and carry between
+WSL/the host and the container. Bind-mounts the host's config dir and
+claude-config clone at the same absolute paths, and points the
+container at the host's project folder with
+`CLAUDE_CODE_PROJECT_DIR_NAME` (or mounts the workspace at its host path
+when the folder name is over that variable's 64-character limit).
+Optionally migrates data out of the current container first, and ends
+with an acceptance checklist.
 
 ### Commit & release authoring
 

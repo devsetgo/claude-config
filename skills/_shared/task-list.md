@@ -38,6 +38,18 @@ to group items sensibly when turning them into GitHub Issues.
 - [ ] src/api/upload.py:18 — validate content-type before write (path traversal risk) [dsg-pr-check, 2026-09-12, critical]
 ```
 
+## In progress
+
+`TODO_TASKS.md` may also start with an `## In progress` section, directly
+under the `# TODO Tasks` title: the plan, decisions made, and next step for
+unfinished work, as short free-form notes rather than checklist items.
+The `dsg-tasks-context` SessionStart hook loads that section (only that
+section) into every new session, so work in flight survives `/clear`,
+compaction, a devcontainer rebuild, or a switch between machines that
+share the project's Claude data. Keep it current as the work changes,
+and delete it once the work is done. It isn't a category: the cleanup
+pass below doesn't touch it.
+
 ## Severity
 
 Four tiers: `critical`, `high`, `medium`, `low`. Judge it by impact if left
