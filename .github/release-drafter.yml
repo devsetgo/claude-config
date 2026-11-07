@@ -68,6 +68,8 @@ categories:
     when:
       labels:
         - "breaking"
+        # Applied by devsetgo/ai-pr-assistant (autofill-pr.yml).
+        - "breaking-change"
   - title: "Features"
     when:
       labels:
