@@ -106,7 +106,10 @@ belongs in the target project's own `CLAUDE.md`, not here.
   only) release: BumpCalver bumps `VERSION` to `YYYY.MM.DD.N` (the build
   number counts releases that UTC day; see `bumpcalver.toml`), commits and
   tags it (bare tag, no `v`), pushes, and publishes Release Drafter's draft
-  under that tag. Versioning is CalVer via BumpCalver, never SemVer.
+  under that tag. Both release workflows pass Release Drafter an explicit
+  `from` baseline (`.github/scripts/release_baseline.sh`: the newest
+  CalVer tag, or the first commit before any release), because v7 finds
+  no changes at all without a published release. Versioning is CalVer via BumpCalver, never SemVer.
   Releases mark batches; clones still track `main` itself (dotfiles always
   clones the branch), and the `dsg-update` hook announces only a new
   release once `VERSION` exists. Never edit `VERSION` or create release
