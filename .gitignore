@@ -216,3 +216,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Claude Code writes account-synced skills to ~/.claude/skills/synced/,
+# which lands here through install.sh's skills/ symlink.
+skills/synced/

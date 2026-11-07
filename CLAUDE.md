@@ -35,23 +35,39 @@ belongs in the target project's own `CLAUDE.md`, not here.
   than spawning a per-skill task file. Any new skill with a worklist added
   later should use the same file, not a new one.
 
+- `global/rules/` holds only instructions that apply to every project —
+  no stack-, team-, or repo-specific rules (those go in the target
+  project's own `CLAUDE.md`). Everything there is in context on every
+  turn of every session, so keep each file short; use `paths:`
+  frontmatter for rules that only matter when certain files are touched.
+  Link it rather than a `CLAUDE.md` so each user's own
+  `~/.claude/CLAUDE.md` stays theirs.
+
 ## Layout
 
 - `skills/` — one subdirectory per skill (`SKILL.md` + any supporting files).
 - `skills/_shared/` — reference docs linked from multiple skills' bodies;
   not a skill itself (no `SKILL.md`, not independently invokable).
 - `agents/` — reusable subagent definitions, if/when added.
-- `install.sh` — symlinks `skills/` to `~/.claude/skills`; this is what
+- `global/rules/` — every-project instruction files, symlinked to
+  `~/.claude/rules/` by `install.sh`.
+- `install.sh` — symlinks `skills/` to `~/.claude/skills` and
+  `global/rules/` to `~/.claude/rules`; this is what
   actually makes the "pulled in via VS Code's dotfiles feature" claim in
   `README.md` true. Never make it copy files instead of symlinking — the
   whole point is that a `git pull` here updates every devcontainer with
-  no reinstall step.
+  no reinstall step. `skills/synced/` is gitignored: Claude Code writes
+  account-synced skills to `~/.claude/skills/synced/`, which lands in the
+  repo through that symlink.
 
 ## Repo automation
 
 - `.github/workflows/skill-lint.yml` — validates every `skills/*/SKILL.md`
   has `name`/`description` frontmatter matching its directory, and that
   `README.md`'s skill table stays in sync with what's under `skills/`.
+  Also runs `.github/scripts/test_install.sh`, which exercises
+  `install.sh` against throwaway HOMEs (fresh, re-run, repoint, conflict,
+  `CLAUDE_CONFIG_DIR`).
 - `.github/workflows/release-drafter.yml` +
   `.github/release-drafter.yml` — drafts a categorized changelog from
   merged PRs, visible in the GitHub Releases tab. This repo doesn't tag
