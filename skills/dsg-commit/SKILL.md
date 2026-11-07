@@ -74,7 +74,12 @@ without asking.
 7. **Create the commit.** Review `git status`/`git diff` and stage the
    files the change actually touches (specific paths, not a blind
    `git add -A`) — double-check anything that looks like it could hold a
-   secret before staging it. Create the commit with the drafted message.
+   secret before staging it. If on the default branch or a detached
+   HEAD, stop and ask the user which branch to create/use before
+   committing. Create the commit with the drafted message. If a
+   pre-commit hook fails, fix the cause and commit again — never
+   `--no-verify`, and never amend an unrelated earlier commit to get
+   around it.
 
 8. **Ask before pushing.** Never push automatically, including on a
    second or later invocation in the same session — creating the commit

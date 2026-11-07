@@ -11,18 +11,22 @@ background: false
 Find meaningful test coverage gaps in the *changed* code — not a general
 crusade for 100% coverage.
 
-Runs as a forked sub-agent with no conversation history: first read
-`../_shared/finding-format.md` (relative to this skill's directory). It
-defines the scope to check, from the arguments or worked out yourself
-when there are none, and how to report.
+Forked run: first read `../_shared/finding-format.md` (relative to this
+skill's directory) for the scope, arguments, and how to report.
 
 ## Steps
 
 1. Run the project's test suite with coverage enabled (e.g. `pytest --cov`,
    `go test -cover`, `jest --coverage`, or whatever this project's own test
    command is — check `CONTRIBUTING.md`/`CLAUDE.md`/CI config before
-   guessing).
-2. Diff coverage against the changed files/lines only. A drop in overall
+   guessing). If there's no test suite or coverage tooling, or the suite
+   can't run here (it needs services or credentials, or it hangs), report
+   that as a finding (see `finding-format.md`), and judge gaps by reading
+   the changed code against the existing tests. Never report a failing or
+   skipped suite as covered.
+2. Diff coverage against the changed lines only. Intersect the coverage
+   report's missing lines with the changed ranges from `git diff -U0
+   <base> HEAD`. A drop in overall
    percentage is not itself a finding; an uncovered branch in a changed
    function is.
 3. Before flagging a gap, rule it out:
@@ -39,5 +43,5 @@ when there are none, and how to report.
 
 A list of gaps, each with: file:line, what's untested, why it matters
 (risk category), and a concrete suggestion (what test to add, or "delete —
-unused" for dead code). See `skills/_shared/finding-format.md` for the
+unused" for dead code). See `../_shared/finding-format.md` for the
 standalone-vs-delegated reporting convention.

@@ -11,10 +11,8 @@ background: false
 Confirm the diff didn't change externally-visible behavior without a
 corresponding doc update.
 
-Runs as a forked sub-agent with no conversation history: first read
-`../_shared/finding-format.md` (relative to this skill's directory). It
-defines the scope to check, from the arguments or worked out yourself
-when there are none, and how to report.
+Forked run: first read `../_shared/finding-format.md` (relative to this
+skill's directory) for the scope, arguments, and how to report.
 
 ## Steps
 
@@ -37,5 +35,5 @@ when there are none, and how to report.
 A list of undocumented changes, each with: file:line of the change, what's
 undocumented, and where it should probably go (which existing doc/section,
 or "no docs dir exists yet" if none fits). See
-`skills/_shared/finding-format.md` for the standalone-vs-delegated
+`../_shared/finding-format.md` for the standalone-vs-delegated
 reporting convention.

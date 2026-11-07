@@ -1,6 +1,6 @@
 ---
 name: dsg-version-check
-description: Check that a version bump is applied consistently across every place this project declares its version — manifests, source constants, Docker/Helm labels, API specs. Recognizes BumpCalver (CalVer) config as the source of truth when present. Use when cutting a release, or standalone whenever a diff touches a version string.
+description: Check that a version bump is applied consistently across every place this project declares its version — manifests, source constants, Docker/Helm labels, API specs. Recognizes BumpCalver (CalVer) config as the source of truth when present. Use when a diff touches a version string, or as part of dsg-release-check.
 context: fork
 model: sonnet
 background: false
@@ -12,10 +12,8 @@ Version drift usually happens because a project declares its version in
 more than one place and only some of them get updated. Find every
 declaration site and confirm they agree.
 
-Runs as a forked sub-agent with no conversation history: first read
-`../_shared/finding-format.md` (relative to this skill's directory). It
-defines the scope to check, from the arguments or worked out yourself
-when there are none, and how to report.
+Forked run: first read `../_shared/finding-format.md` (relative to this
+skill's directory) for the scope, arguments, and how to report.
 
 ## Step 0: check for BumpCalver first
 
@@ -35,6 +33,9 @@ version-declaration sites instead of guessing manifest locations:
   version string in it. A `variable` name left stale after a refactor is
   the most common way this silently stops working.
 - Confirm every tracked file currently holds the same version value.
+- When `delegated-from=dsg-release-check`, also compare that value with
+  the one at `base`. If they're equal, flag it: the version hasn't been
+  bumped since the last release.
 - Grep for version-looking strings in files *not* in the tracked list
   (other manifests, Docker labels, API specs). Anything found there is a
   location BumpCalver can't keep in sync — flag it as either a candidate
@@ -60,9 +61,10 @@ If no BumpCalver config is found, fall back to the generic sweep below.
    - an API spec's own version field (OpenAPI `info.version`, GraphQL
      schema version comment) — only if this project treats that as tied
      to the package version rather than versioned independently
-2. Determine the target version: whichever one already changed in the
-   diff, or (if invoked standalone at release time) the version being
-   released.
+2. The target version is the one in the project's primary manifest at
+   `HEAD`. When `delegated-from=dsg-release-check`, also compare it with
+   the version at `base`. If they're equal, flag it: the version hasn't
+   been bumped since the last release.
 3. Confirm every other declaration site matches the target. Flag any that
    weren't bumped, or that were bumped to a different value.
 4. Don't flag a location that intentionally uses an independent versioning
@@ -73,5 +75,5 @@ If no BumpCalver config is found, fall back to the generic sweep below.
 ## Output
 
 A list of mismatched or missed locations, each with: file:line, current
-value, expected value. See `skills/_shared/finding-format.md` for the
+value, expected value. See `../_shared/finding-format.md` for the
 standalone-vs-delegated reporting convention.

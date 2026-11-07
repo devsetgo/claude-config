@@ -12,10 +12,8 @@ A lighter-weight, config-focused complement to full secret scanning — the
 goal here is specifically hardcoded config and env-var documentation
 drift, not a replacement for `security-review`'s broader secret detection.
 
-Runs as a forked sub-agent with no conversation history: first read
-`../_shared/finding-format.md` (relative to this skill's directory). It
-defines the scope to check, from the arguments or worked out yourself
-when there are none, and how to report.
+Forked run: first read `../_shared/finding-format.md` (relative to this
+skill's directory) for the scope, arguments, and how to report.
 
 ## Steps
 
@@ -39,6 +37,9 @@ when there are none, and how to report.
 ## Output
 
 A list of findings, each with: file:line, what's wrong (hardcoded secret /
-undocumented env var / stale example entry), and a concrete fix. See
-`skills/_shared/finding-format.md` for the standalone-vs-delegated
+undocumented env var / stale example entry), and a concrete fix. Never
+repeat a secret's value in a finding. Show at most its first four
+characters (e.g. `sk-a…`), because findings are copied into task lists
+and issues. See
+`../_shared/finding-format.md` for the standalone-vs-delegated
 reporting convention.

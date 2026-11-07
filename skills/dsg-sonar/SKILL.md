@@ -14,9 +14,12 @@ positives, and fixes the real ones in batches small enough to review.
 Accepts an optional scope argument: a branch name, or `all`/`main` for
 the whole project's current baseline. Default: the current git branch.
 
-If the requested branch has no Sonar analysis yet (CI hasn't pushed
-results for it), say so and offer to fall back to the main/default
-branch's baseline instead of silently returning nothing.
+If the requested branch has no analysis but has an open PR, query with
+`pullRequest=<n>` instead of `branch` (SonarCloud analyzes PRs under the
+PR, not the branch). If the requested branch has no Sonar analysis at
+all (CI hasn't pushed results for it), say so and offer to fall back to
+the main/default branch's baseline instead of silently returning
+nothing.
 
 ## Before running
 
@@ -31,29 +34,16 @@ branch's baseline instead of silently returning nothing.
    missing, ask the user to export it rather than trying to source it
    yourself from anywhere.
 
-   If it's missing, walk the user through getting one before going any
-   further — don't just say "set SONAR_TOKEN" and stop:
-   - **Generate a token**: in the Sonar UI, under the user's own account —
-     **My Account → Security** (same path on SonarCloud and self-hosted
-     SonarQube) — name it something identifiable (e.g. the project or
-     "claude-code"), and set an expiry if the org's policy expects one.
-     A token needs at least browse/read access to the project this skill
-     is targeting; it only needs write access too if the user wants this
-     skill to dismiss false positives (`Administer Issues` permission) —
-     mention that distinction rather than assuming they want the broader
-     scope.
-   - **Where to put it, locally**: export it as `SONAR_TOKEN` in the
-     shell — a `.env`/`.envrc` the project already loads if it has one,
-     otherwise the user's own shell profile. Never suggest committing it
-     to a tracked file or hardcoding it into `sonar-project.properties`.
-   - **Where to put it, for CI**: as a repository/organization secret
-     named to match whatever the CI workflow already reads (check
-     `.github/workflows/*.yml` for the env var name it expects — often
-     `SONAR_TOKEN`) — e.g. GitHub: repo **Settings → Secrets and
-     variables → Actions**. Only mention this path if the user's asking
-     about CI failing, not local runs of this skill.
-   - Once they've exported it in the current shell, re-check for it
-     rather than asking them to restart or re-invoke the skill.
+   If it's missing, walk the user through getting one rather than just
+   saying "set SONAR_TOKEN":
+   - **Generate it** in the Sonar UI under **My Account → Security**
+     (same path on SonarCloud and self-hosted SonarQube). Read/browse
+     access to the project is enough; dismissing false positives also
+     needs `Administer Issues` — mention that distinction.
+   - **Export it** as `SONAR_TOKEN` in the shell (a `.env`/`.envrc` the
+     project already loads, or the user's shell profile). Never commit
+     it, hardcode it in `sonar-project.properties`, or paste it in chat.
+   - Once exported, re-check for it rather than asking them to restart.
 3. Determine the host: `https://sonarcloud.io` unless
    `sonar.host.url` says otherwise (self-hosted SonarQube). SonarCloud
    requests need an `organization` param; self-hosted requests don't.
@@ -65,7 +55,8 @@ page) filtered to `resolved=false`, scoped with `componentKeys` + the
 target `branch` (omit `branch` entirely for the main/default baseline —
 passing it is what makes this branch-scoped instead of whole-app).
 
-Also query `/api/hotspots/search` separately — Security Hotspots use a
+Also query `/api/hotspots/search` separately (it takes `projectKey`
+plus `branch` or `pullRequest`, not `componentKeys`) — Security Hotspots use a
 different status model (`TO_REVIEW`/`REVIEWED`, resolution `SAFE`/
 `FIXED`) and a different endpoint from regular issues; don't lump them
 into the same request or the same classification pass.
@@ -95,11 +86,13 @@ Present the false-positive list to the user before dismissing anything —
 dismissing changes shared state visible to the whole team on Sonar's
 dashboard, so this needs confirmation, not a silent auto-dismiss. On
 confirmation: dismiss via `POST /api/issues/do_transition`
-(`transition=falsepositive` or `wontfix`, whichever fits) and leave a
+(`transition=falsepositive` or `wontfix`, whichever fits; `accept` on
+newer SonarQube servers, 10.x+) and leave a
 comment via `POST /api/issues/add_comment` explaining why — a future
 reader (human or the next analysis run) needs the reasoning, not just a
 status flip. For hotspots, use `POST /api/hotspots/change_status` with
-`resolution=SAFE` plus a comment.
+`hotspot=<key>&status=REVIEWED&resolution=SAFE` plus `comment=`
+explaining why.
 
 ## Fixing real issues, in batches
 
@@ -117,7 +110,7 @@ positives, where the flagged code intentionally stays as-is.
 
 ## Keeping TODO_TASKS.md current
 
-Follow `skills/_shared/task-list.md` for the shared file, structure, and
+Follow `../_shared/task-list.md` for the shared file, structure, and
 cleanup convention. A few things specific to this skill:
 
 - Tag each item `[dsg-sonar, <date>, <severity>]` and include the Sonar
@@ -125,7 +118,9 @@ cleanup convention. A few things specific to this skill:
   key is what makes cleanup precise instead of guesswork.
 - Map Sonar's own severity straight onto the shared scale: `BLOCKER`/
   `CRITICAL` → `critical`, `MAJOR` → `high`, `MINOR` → `medium`, `INFO` →
-  `low`. For hotspots (no severity field), use the hotspot's own
+  `low`. The newer impact severities (MQR mode) map as `BLOCKER` →
+  `critical`, `HIGH` → `high`, `MEDIUM` → `medium`, `LOW` → `low`,
+  `INFO` → `low`. For hotspots (no severity field), use the hotspot's own
   vulnerability probability (`HIGH`/`MEDIUM`/`LOW`) directly as the tier.
 - Group items under `Sonar — Bugs`, `Sonar — Vulnerabilities`,
   `Sonar — Code Smells`, and `Sonar — Security Hotspots` headings.

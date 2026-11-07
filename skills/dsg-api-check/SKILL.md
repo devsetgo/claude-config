@@ -16,10 +16,8 @@ GraphQL API, an RPC/protobuf schema, a public library's exported types and
 functions, an event/message schema, or a database schema other services
 query directly.
 
-Runs as a forked sub-agent with no conversation history: first read
-`../_shared/finding-format.md` (relative to this skill's directory). It
-defines the scope to check, from the arguments or worked out yourself
-when there are none, and how to report.
+Forked run: first read `../_shared/finding-format.md` (relative to this
+skill's directory) for the scope, arguments, and how to report.
 
 ## Steps
 
@@ -29,8 +27,10 @@ when there are none, and how to report.
    those exist, treat the actual request/response handling code as the de
    facto contract.
 
-2. Diff the contract against the base branch/last release tag (not just
-   read the new version in isolation), and classify each change:
+2. Diff the contract at `base` against `HEAD` (see `finding-format.md`),
+   not just the new version in isolation. If no public contract changed,
+   end with `Not applicable: no public contract touched`. Otherwise
+   classify each change:
 
    **Breaking:**
    - a required field/parameter added (existing callers didn't send it)
@@ -63,8 +63,7 @@ A list of contract changes, each tagged `BREAKING` or `NON-BREAKING`,
 with: the symbol/field/endpoint, what changed, and who it affects. For
 `BREAKING` items, suggest a mitigation where one is straightforward
 (version the endpoint, add the field with a backward-compatible default,
-deprecate-then-remove over two releases). See
-`skills/_shared/finding-format.md` for the standalone-vs-delegated
-reporting convention (relevant callers include `dsg-pr-check`,
-`dsg-release-check`, and `dsg-commit` deciding whether a `!`/
-`BREAKING CHANGE` marker is warranted).
+deprecate-then-remove over two releases). When delegated, include the
+`BREAKING`/`NON-BREAKING` tag as each finding's classification.
+`NON-BREAKING` items are informational, so a caller shouldn't fail its
+gate on them. Report per `../_shared/finding-format.md`.

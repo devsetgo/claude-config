@@ -11,10 +11,8 @@ background: false
 Find places where the diff hides or mishandles failures — not a demand for
 error handling everywhere.
 
-Runs as a forked sub-agent with no conversation history: first read
-`../_shared/finding-format.md` (relative to this skill's directory). It
-defines the scope to check, from the arguments or worked out yourself
-when there are none, and how to report.
+Forked run: first read `../_shared/finding-format.md` (relative to this
+skill's directory) for the scope, arguments, and how to report.
 
 ## Steps
 
@@ -42,5 +40,5 @@ when there are none, and how to report.
 
 A list of findings, each with: file:line, what's wrong, and a concrete
 fix (log with context, narrow the catch, add a re-raise, sanitize the
-response). See `skills/_shared/finding-format.md` for the
+response). See `../_shared/finding-format.md` for the
 standalone-vs-delegated reporting convention.

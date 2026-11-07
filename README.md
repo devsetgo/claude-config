@@ -160,10 +160,10 @@ confirmed breaking changes.
 **[dsg-changelog-check](skills/dsg-changelog-check/SKILL.md)** — keeps
 `CHANGELOG.md` current for user-facing changes, but first checks whether
 Release Drafter (or an equivalent action) already generates release
-notes from PR metadata and reports `N/A` rather than hand-editing a file
-that automation owns. When invoked standalone rather than delegated, it
-writes the missing entries itself under the file's existing "Unreleased"
-section, matching its format.
+notes from PR metadata, and reports it as not applicable rather than
+hand-editing a file that automation owns. Otherwise it returns the
+missing entries as ready-to-paste text with the section each belongs in,
+matching the file's format. It never edits the file itself.
 
 **[dsg-comment-check](skills/dsg-comment-check/SKILL.md)** — spot-checks
 new or changed functions for a missing *why* comment — a workaround, a
@@ -226,6 +226,8 @@ own `##[error]` annotations instead of dumping the whole run, and
 classifies each failure as flaky/infra (recommend a re-run) or real
 (test/lint/build) before fixing the real ones — reproducing locally with
 the workflow's own command first, no more copy-pasting logs into chat.
+Only the latest completed run per workflow counts, and re-runs and pushes
+each wait for your yes.
 
 **[dsg-sonar](skills/dsg-sonar/SKILL.md)** — pulls open SonarQube/
 SonarCloud issues and hotspots for a branch or the whole project via the
@@ -243,7 +245,8 @@ items in the same category batch into one checklist issue). Always shows
 the proposed title, body, grouping, and labels and waits for confirmation
 before creating anything, since opening issues is visible to the whole
 team; matching labels are only ever attached if they already exist in the
-repo.
+repo. Converted entries stay in `TODO_TASKS.md`, marked `→ #<n>`, so the
+skills that write to the list don't re-add them.
 
 **[dsg-issue-new](skills/dsg-issue-new/SKILL.md)** — turns a plan already
 worked out in conversation (a new feature, enhancement, or bug fix) into a

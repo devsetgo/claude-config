@@ -17,7 +17,8 @@ infra failure, and fixes what's actually broken.
    with `curl` against `api.github.com`, authenticated with a
    `GITHUB_TOKEN`/`GH_TOKEN` env var (same endpoints `gh` wraps under the
    hood) — don't ask the user to install anything just to answer "why did
-   CI fail."
+   CI fail." Treat "`gh` is installed but not authenticated" (`gh auth
+   status` fails) the same way as `gh` missing.
 2. Confirm this is a GitHub-hosted repo with Actions workflows
    (`.github/workflows/*.yml`) — if there are none, this skill doesn't
    apply.
@@ -28,7 +29,10 @@ Default to the current branch. If it has an open PR, `gh pr checks`
 gives the most direct pass/fail table per check; otherwise use
 `gh run list --branch <branch> --limit 20 --json
 databaseId,name,status,conclusion,headBranch,event,createdAt` and filter
-to `conclusion == "failure"`. Accepts an optional scope argument for a
+to `conclusion == "failure"`. Consider only completed runs, and only
+the most recent run per workflow on the branch head — an older failure
+already superseded by a later green run of the same workflow isn't a
+current failure. Accepts an optional scope argument for a
 different branch, a specific run ID, or `all` for every workflow's most
 recent run regardless of branch.
 
@@ -45,7 +49,9 @@ line isn't useful to show or to act on.
 If `gh` isn't available, the REST API equivalent is
 `GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs` for job/step
 status, then `GET /repos/{owner}/{repo}/actions/jobs/{job_id}/logs` for
-the raw log text (same filtering approach applies).
+the raw log text (same filtering approach applies). The logs endpoint
+returns a redirect, so follow it (`curl -L`). Derive `{owner}/{repo}`
+from `git remote get-url origin`.
 
 ## Classifying each failure
 
@@ -53,7 +59,8 @@ the raw log text (same filtering approach applies).
   OOM, an external service outage, a rate limit, or a test that's known
   to be nondeterministic. These don't need a code fix — recommend
   re-running the job (`gh run rerun <id> --failed`) rather than treating
-  the symptom as a bug. Don't guess "flaky" just because a fix isn't
+  the symptom as a bug. Re-running is outward-facing, so ask the user
+  before doing it. Don't guess "flaky" just because a fix isn't
   obvious; only call it that when the error itself is infra-shaped
   (timeout, connection reset, "runner out of disk," a dependency
   registry 503, etc.), or the same job has intermittently passed on
@@ -68,8 +75,9 @@ the raw log text (same filtering approach applies).
 Reproduce the failure locally first, using the exact command the
 workflow step runs (read the `run:` line from the relevant job in
 `.github/workflows/*.yml`) — that feedback loop is much faster than
-pushing and waiting for CI to re-run for every attempted fix. Only push
-once the local repro is clean.
+pushing and waiting for CI to re-run for every attempted fix. Commit
+fixes locally once the repro is clean, and ask the user before every
+push — an explicit yes each time, like `dsg-commit`.
 
 Don't try to fix every failing job across every workflow in one pass if
 there are several unrelated ones. Batch by workflow or by root cause
@@ -78,7 +86,7 @@ fix, reproduce locally, then move to the next batch.
 
 ## Keeping TODO_TASKS.md current
 
-Follow `skills/_shared/task-list.md` for the shared file, structure, and
+Follow `../_shared/task-list.md` for the shared file, structure, and
 cleanup convention. Specifics for this skill:
 
 - Tag each item `[dsg-actions, <date>, <severity>]` and include the

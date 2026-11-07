@@ -27,7 +27,14 @@ belongs in the target project's own `CLAUDE.md`, not here.
   body line pointing the forked sub-agent at that doc, which defines its
   scope and arguments. A fork sees no conversation, so an orchestrator
   must pass everything a check needs (base, category, docs) as
-  arguments, and start independent checks in one turn.
+  arguments, and start independent checks in one turn. Checks are
+  read-only and never give a verdict. They end with `Not applicable:
+  <reason>` when they don't apply, and report a tool that couldn't run
+  as a finding. The orchestrators (`dsg-pr-check`, `dsg-release-check`)
+  end in `-check` but run inline, so they're exempt from the fork fields.
+- Skills run inside other projects, so reference shared docs as
+  `../_shared/<file>.md` (relative to the skill's directory), never
+  `skills/_shared/...`. The linter enforces this.
 - An orchestrator skill (e.g. `dsg-pr-check`, `dsg-release-check`)
   delegates to focused single-purpose skills rather than inlining their
   logic; only keep a check inline when it's genuinely too
@@ -83,12 +90,19 @@ belongs in the target project's own `CLAUDE.md`, not here.
 
 ## Repo automation
 
-- `.github/workflows/skill-lint.yml` — validates every `skills/*/SKILL.md`
-  has `name`/`description` frontmatter matching its directory, and that
-  `README.md`'s skill table stays in sync with what's under `skills/`.
+- `.github/workflows/skill-lint.yml` — `check_skills.py` validates:
+  - every `skills/*/SKILL.md` has `name`/one-line `description`
+    frontmatter matching its directory;
+  - `*-check` skills (except the orchestrators) carry the fork fields
+    and the `finding-format.md` pointer;
+  - shared-doc references are `../_shared/...` and resolve;
+  - `README.md`'s skill table matches `skills/`, and its relative links
+    and `#anchors` resolve.
+
   Also runs `.github/scripts/test_install.sh`, which exercises
   `install.sh` against throwaway HOMEs (fresh, re-run, repoint, conflict,
-  `CLAUDE_CONFIG_DIR`, settings.json hook merge), and
+  `CLAUDE_CONFIG_DIR`, settings.json hook merge, stale-hook pruning,
+  `DSG_SHARED_CLAUDE_DIR`, hook opt-outs, `DSG_SUBAGENT_MODEL`), and
   `test_dsg_update_check.sh`, which runs the dsg-update hook against a
   throwaway origin/clone, and `test_dsg_tasks_context.sh`, which runs the
   tasks-context hook against sample `TODO_TASKS.md` files.
