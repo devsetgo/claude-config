@@ -55,6 +55,12 @@ working copy, so never discard, stash, or rewrite anything in it.
    `./install.sh --check`. Report any failures verbatim. A link conflict
    means a real file or directory is in the way; tell the user to move it
    aside themselves.
+   - Inside a devcontainer that shares the host's config dir
+     (`DSG_SHARED_CLAUDE_DIR=1`, see `dsg-devcontainer`), `install.sh` is
+     deliberately a no-op. The pull still takes effect on both sides,
+     because it's the same mounted clone. If the update changed
+     `install.sh` or `hooks/`, tell the user to re-run `install.sh` from
+     a host session.
 
 6. **Tell the user to start a new session** if rules, skills, or the
    hook changed. Those load at session start, so the current session is

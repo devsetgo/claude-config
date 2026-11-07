@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Add, remove, or check this repo's SessionStart hook in a Claude Code settings.json.
+"""Add, remove, or check one of this repo's SessionStart hooks in a Claude Code settings.json.
 
-Used by install.sh. settings.json holds each user's own permissions and
-preferences, so it can't be symlinked like skills/ and rules/ -- instead
-exactly one hook entry is merged in, identified by MARKER in its command,
-and everything else in the file is left as it was.
+Used by install.sh, once per hook script. settings.json holds each user's
+own permissions and preferences, so it can't be symlinked like skills/ and
+rules/ -- instead exactly one entry per script is merged in, identified by
+the script's file name in its command, and everything else in the file is
+left as it was.
 
-usage: settings_hook.py {install|remove|check} SETTINGS_JSON HOOK_SCRIPT
+usage: settings_hook.py {install|remove|check} SETTINGS_JSON HOOK_SCRIPT [MATCHER]
+       MATCHER defaults to "startup"; "" registers it for every session
+       source (startup, resume, clear, compact).
 exit:  0 ok / already in the wanted state, 1 check failed,
        3 settings.json unreadable (left untouched)
 """
@@ -16,15 +19,14 @@ import shlex
 import sys
 import tempfile
 
-MARKER = "dsg-update-check.sh"
-
-
-def ours(hook):
-    return MARKER in str(hook.get("command", ""))
-
-
 def main():
     mode, path, script = sys.argv[1:4]
+    matcher = sys.argv[4] if len(sys.argv) > 4 else "startup"
+    marker = os.path.basename(script)
+
+    def ours(hook):
+        return marker in str(hook.get("command", ""))
+
     # Write through a symlinked settings.json (e.g. someone else's dotfiles)
     # rather than replacing the link with a regular file.
     path = os.path.realpath(path)
@@ -43,9 +45,9 @@ def main():
             return 3
 
     groups = data.get("hooks", {}).get("SessionStart", [])
-    current = [h for g in groups for h in g.get("hooks", []) if ours(h)]
+    current = [(g.get("matcher", ""), h.get("command")) for g in groups for h in g.get("hooks", []) if ours(h)]
 
-    installed = [h.get("command") for h in current] == [command]
+    installed = current == [(matcher, command)]
     if mode == "check":
         return 0 if installed else 1
     if mode == "install" and installed:
@@ -65,12 +67,10 @@ def main():
             kept.append(g)
 
     if mode == "install":
-        kept.append(
-            {
-                "matcher": "startup",
-                "hooks": [{"type": "command", "command": command, "timeout": 10}],
-            }
-        )
+        entry = {"hooks": [{"type": "command", "command": command, "timeout": 10}]}
+        if matcher:
+            entry = {"matcher": matcher, **entry}
+        kept.append(entry)
 
     if kept:
         data.setdefault("hooks", {})["SessionStart"] = kept

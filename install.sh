@@ -2,10 +2,11 @@
 # Wires this repo into where Claude Code looks for user-level config:
 #   skills/        -> $CLAUDE_DIR/skills
 #   global/rules/  -> $CLAUDE_DIR/rules   (instructions for every project)
-# and registers hooks/dsg-update-check.sh as a SessionStart hook
-# in $CLAUDE_DIR/settings.json, so sessions say when this clone is behind
-# (set DSG_UPDATE_NO_CHECK=1 when installing to leave it out, or
-# remove it if it's already there).
+# and registers two SessionStart hooks in $CLAUDE_DIR/settings.json:
+#   hooks/dsg-update-check.sh   -- says when this clone is behind
+#   hooks/dsg-tasks-context.sh  -- loads TODO_TASKS.md's "## In progress"
+# Set DSG_UPDATE_NO_CHECK=1 / DSG_TASKS_NO_CONTEXT=1 when installing to
+# leave one out (or remove it if it's already there).
 # Run by VS Code's dotfiles feature after cloning this repo, or by hand on
 # any machine. `install.sh --check` verifies everything without changing
 # anything.
@@ -69,38 +70,56 @@ link_managed() {
   fi
 }
 
+# A devcontainer that bind-mounts the host's Claude config dir (see the
+# dsg-devcontainer skill) sets this, so a dotfiles run of install.sh inside
+# the container doesn't repoint the host's links at the container's clone.
+if [ "$MODE" = install ] && [ "${DSG_SHARED_CLAUDE_DIR:-}" = 1 ]; then
+  echo "DSG_SHARED_CLAUDE_DIR=1: $CLAUDE_DIR is shared from the host -- run install.sh there instead."
+  exit 0
+fi
+
 [ "$MODE" = install ] && mkdir -p "$CLAUDE_DIR"
 
 link_managed "$REPO_DIR/skills" "$CLAUDE_DIR/skills"
 link_managed "$REPO_DIR/global/rules" "$CLAUDE_DIR/rules"
 
-# settings.json is per-user (permissions etc.), so the hook entry is merged
+# settings.json is per-user (permissions etc.), so hook entries are merged
 # into it rather than linked. A failure here is a warning, not a failure:
-# the links above are what make skills and rules work; the dsg-update check
-# is a convenience.
-HOOK_SCRIPT="$REPO_DIR/hooks/dsg-update-check.sh"
+# the links above are what make skills and rules work; the hooks are
+# conveniences.
 SETTINGS="$CLAUDE_DIR/settings.json"
-hook_mode=install
-[ "${DSG_UPDATE_NO_CHECK:-}" = 1 ] && hook_mode=remove
-[ "$MODE" = check ] && hook_mode=check
 
-if ! command -v python3 >/dev/null 2>&1; then
-  echo "warning: python3 not found -- can't $hook_mode the dsg-update hook in $SETTINGS." >&2
-  echo "Add it by hand: a SessionStart hook (matcher \"startup\") running $HOOK_SCRIPT" >&2
-elif python3 "$REPO_DIR/hooks/settings_hook.py" "$hook_mode" "$SETTINGS" "$HOOK_SCRIPT"; then
-  case "$hook_mode" in
-    install) echo "dsg-update hook registered in $SETTINGS" ;;
-    remove)  echo "dsg-update hook not registered (DSG_UPDATE_NO_CHECK=1)" ;;
-    check)   echo "ok: dsg-update hook registered in $SETTINGS" ;;
-  esac
-else
-  rc=$?
-  if [ "$hook_mode" = check ] && [ "$rc" -eq 1 ]; then
-    echo "warning: dsg-update hook missing or stale in $SETTINGS (re-run install.sh)" >&2
-  else
-    echo "warning: couldn't $hook_mode the dsg-update hook in $SETTINGS (left unchanged)." >&2
+# register_hook NAME SCRIPT OPT_OUT_VAR MATCHER
+register_hook() {
+  local name="$1" script="$REPO_DIR/hooks/$2" opt_out="$3" matcher="$4" mode=install rc
+  [ "${!opt_out:-}" = 1 ] && mode=remove
+  [ "$MODE" = check ] && mode=check
+
+  if ! command -v python3 >/dev/null 2>&1; then
+    echo "warning: python3 not found -- can't $mode the $name hook in $SETTINGS." >&2
+    echo "Add it by hand: a SessionStart hook (matcher \"$matcher\") running $script" >&2
+    return
   fi
-fi
+  if python3 "$REPO_DIR/hooks/settings_hook.py" "$mode" "$SETTINGS" "$script" "$matcher"; then
+    case "$mode" in
+      install) echo "$name hook registered in $SETTINGS" ;;
+      remove)  echo "$name hook not registered ($opt_out=1)" ;;
+      check)   echo "ok: $name hook registered in $SETTINGS" ;;
+    esac
+    return
+  fi
+  rc=$?
+  if [ "$mode" = check ] && [ "$rc" -eq 1 ]; then
+    echo "warning: $name hook missing or stale in $SETTINGS (re-run install.sh)" >&2
+  else
+    echo "warning: couldn't $mode the $name hook in $SETTINGS (left unchanged)." >&2
+  fi
+}
+
+register_hook dsg-update dsg-update-check.sh DSG_UPDATE_NO_CHECK startup
+# Every session source, so in-progress work comes back after /clear and
+# compaction too, not just on a fresh start.
+register_hook dsg-tasks-context dsg-tasks-context.sh DSG_TASKS_NO_CONTEXT ""
 
 if [ "$failures" -gt 0 ]; then
   echo "$failures link(s) not installed -- see errors above." >&2
