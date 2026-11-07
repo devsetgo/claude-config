@@ -51,8 +51,14 @@ belongs in the target project's own `CLAUDE.md`, not here.
 - `agents/` — reusable subagent definitions, if/when added.
 - `global/rules/` — every-project instruction files, symlinked to
   `~/.claude/rules/` by `install.sh`.
+- `hooks/` — `dsg-update-check.sh`, a SessionStart hook that
+  reports when the clone is behind (suggesting `dsg-update`), and
+  `settings_hook.py`, which `install.sh` uses to merge that one hook
+  entry into the user's `settings.json`. The hook must never block or
+  fail a session — keep network calls in the detached background fetch.
 - `install.sh` — symlinks `skills/` to `~/.claude/skills` and
-  `global/rules/` to `~/.claude/rules`; this is what
+  `global/rules/` to `~/.claude/rules`, and registers the dsg-update
+  hook; this is what
   actually makes the "pulled in via VS Code's dotfiles feature" claim in
   `README.md` true. Never make it copy files instead of symlinking — the
   whole point is that a `git pull` here updates every devcontainer with
@@ -67,7 +73,9 @@ belongs in the target project's own `CLAUDE.md`, not here.
   `README.md`'s skill table stays in sync with what's under `skills/`.
   Also runs `.github/scripts/test_install.sh`, which exercises
   `install.sh` against throwaway HOMEs (fresh, re-run, repoint, conflict,
-  `CLAUDE_CONFIG_DIR`).
+  `CLAUDE_CONFIG_DIR`, settings.json hook merge), and
+  `test_dsg_update_check.sh`, which runs the dsg-update hook against a
+  throwaway origin/clone.
 - `.github/workflows/release-drafter.yml` +
   `.github/release-drafter.yml` — drafts a categorized changelog from
   merged PRs, visible in the GitHub Releases tab. This repo doesn't tag
