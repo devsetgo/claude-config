@@ -7,9 +7,9 @@ name: AI PR Assistant
 # Tuned to coexist with Release Drafter (.github/release-drafter.yml),
 # whose autolabeler reads Conventional-Commits PR titles (dsg-commit
 # drafts them):
-# - Titles: "smart" only on "opened" (replaces a placeholder title like
-#   "Dev", keeps a good one), "never" on later pushes, so a title that's
-#   already feeding the autolabeler isn't rewritten.
+# - Titles: suggested in the action log only ("never"), not applied. In
+#   practice "smart" rewrote a correct "ci: ..." title into plain prose
+#   (PR #11), and an unprefixed title is invisible to the autolabeler.
 # - Labels: chosen from Release Drafter's category labels, and only
 #   applied to a PR with no labels yet ("never"), so the AI fills gaps
 #   instead of overriding the autolabeler.
@@ -49,7 +49,7 @@ jobs:
           allowed_users: devsetgo
           overwrite_description: smart
           generate_title: true
-          overwrite_title: ${{ github.event.action == 'opened' && 'smart' || 'never' }}
+          overwrite_title: never
           enable_labels: true
           overwrite_labels: never
           label_taxonomy: 'feature,enhancement,bug,docs,code improvements,github actions,chore,dependencies'

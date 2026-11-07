@@ -80,8 +80,9 @@ belongs in the target project's own `CLAUDE.md`, not here.
   (OpenAI, `OPENAI_API_KEY` repo secret) to fill in PR descriptions
   ("smart": keeps a good one, extends or replaces a thin one), titles,
   labels, and breaking-change flags. It's tuned not to fight Release
-  Drafter's title-based autolabeler: titles are only replaced on
-  `opened` and only if they're placeholders, labels come from Release
+  Drafter's title-based autolabeler: titles are only suggested in the
+  action log, never applied (`smart` rewrote a correct `ci:` title into
+  unprefixed prose), labels come from Release
   Drafter's category labels and are only added to an unlabeled PR, and
   the action's `breaking-change` label is mapped in
   `release-drafter.yml`. Keep those in sync if either side's labels
