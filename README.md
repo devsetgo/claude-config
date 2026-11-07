@@ -20,7 +20,9 @@ here generic and reusable across projects. See `CLAUDE.md` for conventions.
 2. Every devcontainer built after that clones this repo to `~/claude-config`
    and runs `install.sh`, which symlinks `skills/` into wherever Claude
    Code looks for user-level skills — so every skill here just shows up,
-   no per-project devcontainer edits.
+   no per-project devcontainer edits. It also symlinks `global/rules/` to
+   `~/.claude/rules/`, whose files Claude Code loads at startup as
+   instructions for every project (see [Global rules](#global-rules)).
 
 To set it up manually on a machine without the dotfiles feature: clone this
 repo anywhere and run `./install.sh`.
@@ -30,6 +32,23 @@ the same (Windows, WSL, and server setups can differ) — `install.sh`
 honors `CLAUDE_CONFIG_DIR` if it's set in your environment, same as
 Claude Code's own CLI, so set that first if your setup uses a
 non-default config directory.
+
+Run `./install.sh --check` to verify the links without changing
+anything. If a target already exists as a real file or directory,
+`install.sh` leaves it alone, reports it, and still installs the other
+links — move it aside and re-run.
+
+## Global rules
+
+Files in [global/rules/](global/rules/) load into every Claude Code
+session on every project, alongside (not replacing) your own
+`~/.claude/CLAUDE.md`. They cost context on every turn, so keep them
+short and generic. Start a new session after installing, then run
+`/memory` to confirm they're listed.
+
+- **[task-routing](global/rules/task-routing.md)** — when to work inline,
+  delegate to a cheaper fresh sub-agent, or fork, sized by how long the
+  work's output would sit in the main context.
 
 ## Skills
 

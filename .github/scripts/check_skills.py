@@ -11,7 +11,10 @@ README = ROOT / "README.md"
 errors = []
 
 skill_dirs = sorted(
-    p.name for p in SKILLS_DIR.iterdir() if p.is_dir() and not p.name.startswith("_")
+    p.name
+    for p in SKILLS_DIR.iterdir()
+    # synced/ is Claude Code's account-synced skills (gitignored), not ours.
+    if p.is_dir() and not p.name.startswith("_") and p.name != "synced"
 )
 
 for name in skill_dirs:
