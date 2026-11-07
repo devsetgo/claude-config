@@ -1,12 +1,20 @@
 ---
 name: dsg-error-check
 description: Check new/changed code for swallowed exceptions, inconsistent logging, and error responses that leak internals. Use standalone or as part of dsg-pr-check.
+context: fork
+model: sonnet
+background: false
 ---
 
 # Error Handling Check
 
 Find places where the diff hides or mishandles failures — not a demand for
 error handling everywhere.
+
+Runs as a forked sub-agent with no conversation history: first read
+`../_shared/finding-format.md` (relative to this skill's directory). It
+defines the scope to check, from the arguments or worked out yourself
+when there are none, and how to report.
 
 ## Steps
 

@@ -1,6 +1,9 @@
 ---
 name: dsg-version-check
 description: Check that a version bump is applied consistently across every place this project declares its version — manifests, source constants, Docker/Helm labels, API specs. Recognizes BumpCalver (CalVer) config as the source of truth when present. Use when cutting a release, or standalone whenever a diff touches a version string.
+context: fork
+model: sonnet
+background: false
 ---
 
 # Version Bump Check
@@ -8,6 +11,11 @@ description: Check that a version bump is applied consistently across every plac
 Version drift usually happens because a project declares its version in
 more than one place and only some of them get updated. Find every
 declaration site and confirm they agree.
+
+Runs as a forked sub-agent with no conversation history: first read
+`../_shared/finding-format.md` (relative to this skill's directory). It
+defines the scope to check, from the arguments or worked out yourself
+when there are none, and how to report.
 
 ## Step 0: check for BumpCalver first
 

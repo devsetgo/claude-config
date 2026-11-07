@@ -19,6 +19,44 @@ import shlex
 import sys
 import tempfile
 
+
+class Unreadable(Exception):
+    """settings.json exists but isn't a JSON object; never overwrite it."""
+
+
+def load(path):
+    """Return (resolved path, data). Raises Unreadable."""
+    # Write through a symlinked settings.json (e.g. someone else's dotfiles)
+    # rather than replacing the link with a regular file.
+    path = os.path.realpath(path)
+    if not os.path.exists(path):
+        return path, {}
+    try:
+        with open(path) as f:
+            data = json.load(f)
+    except (OSError, ValueError) as e:
+        raise Unreadable(f"{path}: can't parse ({e}); not modifying it.")
+    if not isinstance(data, dict):
+        raise Unreadable(f"{path}: top level isn't a JSON object; not modifying it.")
+    return path, data
+
+
+def save(path, data):
+    """Atomically replace path with data, keeping the file's mode."""
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path), prefix=".settings-")
+    try:
+        with os.fdopen(fd, "w") as f:
+            json.dump(data, f, indent=2)
+            f.write("\n")
+        if os.path.exists(path):
+            os.chmod(tmp, os.stat(path).st_mode & 0o777)
+        os.replace(tmp, path)
+    except BaseException:
+        os.unlink(tmp)
+        raise
+
+
 def main():
     mode, path, script = sys.argv[1:4]
     matcher = sys.argv[4] if len(sys.argv) > 4 else "startup"
@@ -27,22 +65,12 @@ def main():
     def ours(hook):
         return marker in str(hook.get("command", ""))
 
-    # Write through a symlinked settings.json (e.g. someone else's dotfiles)
-    # rather than replacing the link with a regular file.
-    path = os.path.realpath(path)
     command = shlex.quote(script)
-
-    data = {}
-    if os.path.exists(path):
-        try:
-            with open(path) as f:
-                data = json.load(f)
-        except (OSError, ValueError) as e:
-            print(f"{path}: can't parse ({e}); not modifying it.", file=sys.stderr)
-            return 3
-        if not isinstance(data, dict):
-            print(f"{path}: top level isn't a JSON object; not modifying it.", file=sys.stderr)
-            return 3
+    try:
+        path, data = load(path)
+    except Unreadable as e:
+        print(e, file=sys.stderr)
+        return 3
 
     groups = data.get("hooks", {}).get("SessionStart", [])
     current = [(g.get("matcher", ""), h.get("command")) for g in groups for h in g.get("hooks", []) if ours(h)]
@@ -79,21 +107,8 @@ def main():
         if not data["hooks"]:
             del data["hooks"]
 
-    if json.dumps(data, sort_keys=True) == before:
-        return 0
-
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path), prefix=".settings-")
-    try:
-        with os.fdopen(fd, "w") as f:
-            json.dump(data, f, indent=2)
-            f.write("\n")
-        if os.path.exists(path):
-            os.chmod(tmp, os.stat(path).st_mode & 0o777)
-        os.replace(tmp, path)
-    except BaseException:
-        os.unlink(tmp)
-        raise
+    if json.dumps(data, sort_keys=True) != before:
+        save(path, data)
     return 0
 
 

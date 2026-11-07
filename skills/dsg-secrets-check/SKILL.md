@@ -1,6 +1,9 @@
 ---
 name: dsg-secrets-check
 description: Check for hardcoded secrets/config in the diff and drift between the env-example file and the env vars actually read by code. Use standalone or as part of dsg-pr-check.
+context: fork
+model: sonnet
+background: false
 ---
 
 # Secrets & Config Drift Check
@@ -8,6 +11,11 @@ description: Check for hardcoded secrets/config in the diff and drift between th
 A lighter-weight, config-focused complement to full secret scanning — the
 goal here is specifically hardcoded config and env-var documentation
 drift, not a replacement for `security-review`'s broader secret detection.
+
+Runs as a forked sub-agent with no conversation history: first read
+`../_shared/finding-format.md` (relative to this skill's directory). It
+defines the scope to check, from the arguments or worked out yourself
+when there are none, and how to report.
 
 ## Steps
 

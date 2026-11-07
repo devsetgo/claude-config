@@ -1,12 +1,20 @@
 ---
 name: dsg-dep-check
 description: Check dependencies changed in the diff for known vulnerabilities, license conflicts, unused additions, and abandoned packages. Use standalone or as part of dsg-pr-check.
+context: fork
+model: sonnet
+background: false
 ---
 
 # Dependency Audit Check
 
 Focus on dependencies the diff actually touches — new packages and version
 bumps — not a full inventory of everything already in the lockfile.
+
+Runs as a forked sub-agent with no conversation history: first read
+`../_shared/finding-format.md` (relative to this skill's directory). It
+defines the scope to check, from the arguments or worked out yourself
+when there are none, and how to report.
 
 ## Steps
 

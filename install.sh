@@ -7,6 +7,8 @@
 #   hooks/dsg-tasks-context.sh  -- loads TODO_TASKS.md's "## In progress"
 # Set DSG_UPDATE_NO_CHECK=1 / DSG_TASKS_NO_CONTEXT=1 when installing to
 # leave one out (or remove it if it's already there).
+# Opt-in: DSG_SUBAGENT_MODEL=<model> also sets CLAUDE_CODE_SUBAGENT_MODEL
+# (the default model for unassigned sub-agents) in that settings.json.
 # Run by VS Code's dotfiles feature after cloning this repo, or by hand on
 # any machine. `install.sh --check` verifies everything without changing
 # anything.
@@ -120,6 +122,37 @@ register_hook dsg-update dsg-update-check.sh DSG_UPDATE_NO_CHECK startup
 # Every session source, so in-progress work comes back after /clear and
 # compaction too, not just on a fresh start.
 register_hook dsg-tasks-context dsg-tasks-context.sh DSG_TASKS_NO_CONTEXT ""
+
+# Opt-in: default model for sub-agents that aren't assigned one some other
+# way (a per-call model or an agent definition's model still wins). Off
+# unless DSG_SUBAGENT_MODEL is set, because a model preference is personal
+# rather than a convention. With it unset, an existing value is left alone,
+# so a dotfiles re-run without the variable never undoes it;
+# DSG_SUBAGENT_MODEL=unset removes it.
+if [ -n "${DSG_SUBAGENT_MODEL:-}" ]; then
+  env_mode=set
+  [ "$DSG_SUBAGENT_MODEL" = unset ] && env_mode=unset
+  [ "$MODE" = check ] && env_mode=check
+  case "$DSG_SUBAGENT_MODEL" in
+    *[!A-Za-z0-9._-]*)
+      echo "warning: DSG_SUBAGENT_MODEL='$DSG_SUBAGENT_MODEL' isn't a model alias or ID; ignoring it." >&2 ;;
+    *)
+      if ! command -v python3 >/dev/null 2>&1; then
+        echo "warning: python3 not found -- can't $env_mode CLAUDE_CODE_SUBAGENT_MODEL in $SETTINGS." >&2
+      elif python3 "$REPO_DIR/hooks/settings_env.py" "$env_mode" "$SETTINGS" \
+          CLAUDE_CODE_SUBAGENT_MODEL "$DSG_SUBAGENT_MODEL"; then
+        case "$env_mode" in
+          set)   echo "CLAUDE_CODE_SUBAGENT_MODEL=$DSG_SUBAGENT_MODEL set in $SETTINGS" ;;
+          unset) echo "CLAUDE_CODE_SUBAGENT_MODEL removed from $SETTINGS" ;;
+          check) echo "ok: CLAUDE_CODE_SUBAGENT_MODEL=$DSG_SUBAGENT_MODEL in $SETTINGS" ;;
+        esac
+      elif [ "$env_mode" = check ]; then
+        echo "warning: CLAUDE_CODE_SUBAGENT_MODEL isn't $DSG_SUBAGENT_MODEL in $SETTINGS (re-run install.sh)" >&2
+      else
+        echo "warning: couldn't $env_mode CLAUDE_CODE_SUBAGENT_MODEL in $SETTINGS (left unchanged)." >&2
+      fi ;;
+  esac
+fi
 
 if [ "$failures" -gt 0 ]; then
   echo "$failures link(s) not installed -- see errors above." >&2

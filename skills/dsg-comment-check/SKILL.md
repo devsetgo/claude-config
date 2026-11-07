@@ -1,12 +1,20 @@
 ---
 name: dsg-comment-check
 description: Spot-check new/changed functions for missing "why" comments on non-obvious logic — workarounds, invariants, hidden constraints — not "what" comments. Use standalone or as part of dsg-pr-check.
+context: fork
+model: sonnet
+background: false
 ---
 
 # Comment Coverage Check
 
 Find changed functions that have tricky logic and zero explanation — not
 functions that are merely uncommented.
+
+Runs as a forked sub-agent with no conversation history: first read
+`../_shared/finding-format.md` (relative to this skill's directory). It
+defines the scope to check, from the arguments or worked out yourself
+when there are none, and how to report.
 
 ## Steps
 

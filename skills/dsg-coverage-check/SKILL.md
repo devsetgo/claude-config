@@ -1,12 +1,20 @@
 ---
 name: dsg-coverage-check
 description: Identify test coverage gaps in changed code (not just overall percentage), ruling out dead code and unreachable branches first, prioritized by risk. Use standalone or as part of dsg-pr-check.
+context: fork
+model: sonnet
+background: false
 ---
 
 # Test Coverage Check
 
 Find meaningful test coverage gaps in the *changed* code — not a general
 crusade for 100% coverage.
+
+Runs as a forked sub-agent with no conversation history: first read
+`../_shared/finding-format.md` (relative to this skill's directory). It
+defines the scope to check, from the arguments or worked out yourself
+when there are none, and how to report.
 
 ## Steps
 

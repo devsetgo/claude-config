@@ -22,7 +22,12 @@ belongs in the target project's own `CLAUDE.md`, not here.
   performing an action) should follow `skills/_shared/finding-format.md`
   for its Output section instead of restating the standalone-vs-delegated
   convention inline — link to it. If that convention changes, it should
-  only need editing in one place.
+  only need editing in one place. It also sets `context: fork`,
+  `model: sonnet` and `background: false` in its frontmatter, plus one
+  body line pointing the forked sub-agent at that doc, which defines its
+  scope and arguments. A fork sees no conversation, so an orchestrator
+  must pass everything a check needs (base, category, docs) as
+  arguments, and start independent checks in one turn.
 - An orchestrator skill (e.g. `dsg-pr-check`, `dsg-release-check`)
   delegates to focused single-purpose skills rather than inlining their
   logic; only keep a check inline when it's genuinely too
@@ -55,7 +60,9 @@ belongs in the target project's own `CLAUDE.md`, not here.
   `settings.json`: `dsg-update-check.sh` (reports when the clone is
   behind, suggesting `dsg-update`) and `dsg-tasks-context.sh` (loads
   `TODO_TASKS.md`'s `## In progress` section). `settings_hook.py` merges
-  one entry per script into `settings.json`. Hooks must never block or
+  one entry per script into `settings.json`, and `settings_env.py` (which
+  reuses its load/save) sets the opt-in `CLAUDE_CODE_SUBAGENT_MODEL` from
+  `DSG_SUBAGENT_MODEL`. Hooks must never block or
   fail a session: keep network calls in detached background jobs, and
   keep output small, because it lands in every session's context.
 - `VERSION` + `bumpcalver.toml` — the current release version and the

@@ -1,6 +1,9 @@
 ---
 name: dsg-api-check
 description: Classify API/schema changes in the diff as breaking or non-breaking — required vs optional fields, type changes, removed/renamed fields or endpoints, changed defaults or validation. Use before opening a PR that touches a public API, schema, or library contract.
+context: fork
+model: sonnet
+background: false
 ---
 
 # API Contract Check
@@ -12,6 +15,11 @@ consumers — not just whether the code compiles or the tests pass.
 GraphQL API, an RPC/protobuf schema, a public library's exported types and
 functions, an event/message schema, or a database schema other services
 query directly.
+
+Runs as a forked sub-agent with no conversation history: first read
+`../_shared/finding-format.md` (relative to this skill's directory). It
+defines the scope to check, from the arguments or worked out yourself
+when there are none, and how to report.
 
 ## Steps
 
