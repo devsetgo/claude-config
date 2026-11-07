@@ -18,6 +18,25 @@ of a single PR's diff. Also read this project's own standards docs
 precedence rule as `dsg-pr-check` applies: project conventions win over the
 generic guidance here.
 
+## How delegated checks run
+
+The focused `dsg-*-check` skills run as forked sub-agents on `sonnet`;
+see `../_shared/finding-format.md`, relative to this skill's directory.
+A forked check can't see this conversation, so:
+
+- **Pass the scope explicitly.** Invoke each with
+  `delegated-from=dsg-release-check base=<last release tag>
+  category="<checklist item name>" docs=<comma-separated paths>`.
+  - Add `scope=full-tree` for `dsg-dep-check` (item 4).
+  - Add `scope=contract-at-base` for `dsg-api-check` (item 3), so it
+    compares the contract at the tag against `HEAD`.
+  - If the repo has no release tag yet, say so and use its first commit
+    (`git rev-list --max-parents=0 HEAD`) as the base.
+- **Start items 1–4 in one turn,** as several Skill calls in a single
+  message, then do item 5 inline. Take each check's findings as
+  returned. Re-invoke a failed check once, then report it as `FAIL` with
+  "check didn't complete".
+
 ## Checklist
 
 1. **Version bump consistency** — delegate to the `dsg-version-check`

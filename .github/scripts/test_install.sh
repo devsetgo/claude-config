@@ -114,4 +114,30 @@ run HOME="$H" DSG_UPDATE_NO_CHECK=1 DSG_TASKS_NO_CONTEXT=1 "$REPO_DIR/install.sh
 python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); assert "hooks" not in d, d' \
   "$H/.claude/settings.json" || fail "empty hooks block left behind"
 
+env_val() {
+  python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("env", {}).get("CLAUDE_CODE_SUBAGENT_MODEL", ""))' "$1"
+}
+
+echo "== DSG_SUBAGENT_MODEL is opt-in, preserves other env, and survives re-runs"
+H="$WORK/subagent"; mkdir -p "$H/.claude"
+echo '{"env": {"FOO": "bar"}}' > "$H/.claude/settings.json"
+run HOME="$H" "$REPO_DIR/install.sh" >/dev/null
+[ -z "$(env_val "$H/.claude/settings.json")" ] || fail "set without DSG_SUBAGENT_MODEL"
+run HOME="$H" DSG_SUBAGENT_MODEL=sonnet "$REPO_DIR/install.sh" >/dev/null
+[ "$(env_val "$H/.claude/settings.json")" = sonnet ] || fail "not set to sonnet"
+python3 -c 'import json,sys; assert json.load(open(sys.argv[1]))["env"]["FOO"] == "bar"' \
+  "$H/.claude/settings.json" || fail "other env entries lost"
+run HOME="$H" DSG_SUBAGENT_MODEL=sonnet "$REPO_DIR/install.sh" --check >/dev/null 2>"$WORK/check.err"
+! grep -q CLAUDE_CODE_SUBAGENT_MODEL "$WORK/check.err" || fail "--check flagged a correct value"
+run HOME="$H" "$REPO_DIR/install.sh" >/dev/null
+[ "$(env_val "$H/.claude/settings.json")" = sonnet ] || fail "re-run without the variable undid it"
+
+echo "== DSG_SUBAGENT_MODEL: rejects odd values, unset removes only that key"
+run HOME="$H" DSG_SUBAGENT_MODEL='so"nnet' "$REPO_DIR/install.sh" >/dev/null 2>&1
+[ "$(env_val "$H/.claude/settings.json")" = sonnet ] || fail "invalid value was written"
+run HOME="$H" DSG_SUBAGENT_MODEL=unset "$REPO_DIR/install.sh" >/dev/null
+[ -z "$(env_val "$H/.claude/settings.json")" ] || fail "unset didn't remove it"
+python3 -c 'import json,sys; assert json.load(open(sys.argv[1]))["env"] == {"FOO": "bar"}' \
+  "$H/.claude/settings.json" || fail "unset touched other env entries"
+
 echo "install.sh tests OK"

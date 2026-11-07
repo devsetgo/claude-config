@@ -1,6 +1,9 @@
 ---
 name: dsg-changelog-check
 description: Keep CHANGELOG.md current for user-facing changes — skips repos where Release Drafter (or an equivalent release-notes action) already generates it from PR metadata. Use standalone after finishing a change, or as part of dsg-pr-check.
+context: fork
+model: sonnet
+background: false
 ---
 
 # Changelog Check
@@ -8,6 +11,11 @@ description: Keep CHANGELOG.md current for user-facing changes — skips repos w
 Most changelog automation works from PR titles/labels, not a hand-maintained
 file — check for that first so this skill doesn't fight with existing
 tooling.
+
+Runs as a forked sub-agent with no conversation history: first read
+`../_shared/finding-format.md` (relative to this skill's directory). It
+defines the scope to check, from the arguments or worked out yourself
+when there are none, and how to report.
 
 ## Steps
 

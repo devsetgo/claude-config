@@ -23,6 +23,33 @@ Project-specific conventions found there (test safety rules, naming
 patterns, what "done" means for this repo) take precedence over the
 generic guidance below.
 
+## How delegated checks run
+
+The focused `dsg-*-check` skills run as forked sub-agents on `sonnet`
+(set in their own frontmatter; see `../_shared/finding-format.md`,
+relative to this skill's directory). Each one checks the diff in its own
+context, and only its findings come back here. That keeps their diffs
+and grep output out of this session.
+
+- **Before delegating,** record:
+  - The base: `git merge-base HEAD origin/<default>`, with the default
+    branch from `git symbolic-ref --short refs/remotes/origin/HEAD`,
+    falling back to `main`.
+  - The paths of the standards docs found above.
+- **Invoke each `dsg-*-check`** with the arguments `delegated-from=dsg-pr-check
+  base=<sha> category="<checklist item name>" docs=<comma-separated
+  paths>`. A forked check can't see this conversation, so anything it
+  needs has to be in those arguments.
+- **Start all the delegated `dsg-*-check` skills in one turn,** as
+  several Skill calls in a single message, so they don't run one after
+  another. Then do the inline items (6, 7) and the built-in
+  `security-review` and `code-review` delegations. Those last two run as
+  they always have.
+- **Take each check's findings as returned.** Don't redo its work inline
+  to double-check it, because that pulls the noise back in. If a check
+  fails or returns nothing usable, invoke it once more. If it fails
+  again, report that item as `FAIL` with "check didn't complete".
+
 ## Checklist
 
 1. **Test coverage gaps** — delegate to the `dsg-coverage-check` skill.

@@ -91,6 +91,24 @@ short and generic. Start a new session after installing, then run
   `TODO_TASKS.md`, which the `dsg-tasks-context` hook loads at session
   start.
 
+### Default sub-agent model (opt-in)
+
+The task-routing rule names a model whenever it delegates. To also give
+any sub-agent that isn't assigned one a cheaper default, install with
+`DSG_SUBAGENT_MODEL` set:
+
+```sh
+DSG_SUBAGENT_MODEL=sonnet ./install.sh
+```
+
+This sets `CLAUDE_CODE_SUBAGENT_MODEL` in the `env` block of
+`~/.claude/settings.json`, leaving the rest of the file alone. A model
+passed per call, or set in an agent's definition, still wins. It doesn't
+change the built-in Explore and Plan agents, and forks always use the
+main model. It's off unless you set it, because a model preference is
+personal. Re-running `install.sh` without the variable leaves an existing
+value alone, and `DSG_SUBAGENT_MODEL=unset ./install.sh` removes it.
+
 ## Skills
 
 ### Gates
@@ -122,7 +140,10 @@ complete and correctly categorized.
 Each finds one specific class of issue and reports it — never fixes
 automatically. Usable standalone or delegated from `dsg-pr-check`/
 `dsg-release-check`; see `skills/_shared/finding-format.md` for the
-shared reporting convention they all follow.
+shared reporting convention they all follow. Each runs as a forked
+sub-agent on `sonnet` (`context: fork`), so its diff and search output
+stay out of your session and only its findings come back. The gates
+start them in parallel.
 
 **[dsg-api-check](skills/dsg-api-check/SKILL.md)** — classifies changes
 to a public API/schema/library contract as breaking or non-breaking:
