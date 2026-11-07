@@ -39,10 +39,9 @@ taken from the docs:
   It reads `$CLAUDE_CONFIG_DIR/.claude.json` instead of `~/.claude.json`.
   That file holds onboarding, per-project state such as trust and
   allowed tools, and user-scope MCP servers. The host, running without
-  the variable, keeps using `~/.claude.json`. So the two sides have
+  the variable, keeps using `~/.claude.json`, so the two sides have
   separate state files. The container's survives rebuilds, because it
-  sits in the mounted dir. Memory, transcripts, settings, skills and
-  rules are still shared.
+  sits in the mounted dir. Everything else is still shared.
 - On Linux, login lives in `.credentials.json` inside the config dir, so
   it's shared. A contributor reported that on macOS, login lives in the
   Keychain instead: setting `CLAUDE_CONFIG_DIR` in a Mac host session
@@ -66,9 +65,8 @@ the user to continue from a host session.
    - Copy `~/.claude/projects/<container key>/.` into
      `<repo>/.git/claude-migrate/`. Use `.git/` because it's never
      committed and the host can see it.
-   - Note that copying data out mid-conversation doesn't include the
-     rest of that conversation. Redo the copy just before the rebuild in
-     step 5.
+   - Copying mid-conversation misses the rest of it; redo the copy just
+     before the rebuild in step 5.
 
 2. **Check the host side.**
    - Claude Code in the container must be v2.1.234 or later.
@@ -77,7 +75,8 @@ the user to continue from a host session.
      first. The clone's path is the directory above the symlink's
      target.
    - Compute the host key from the repo root: `git rev-parse
-     --show-toplevel`, then `pwd -P` on that, then replace every
+     --show-toplevel` (the directory sessions start in, normally the
+     repo root), then `pwd -P` on that, then replace every
      non-alphanumeric character with `-`. It must match the folder name
      under `~/.claude/projects/`. If that folder exists, list it to
      confirm.
@@ -87,11 +86,9 @@ the user to continue from a host session.
      doesn't exist yet, run `cp -p ~/.claude.json ~/.claude/.claude.json`.
      The container then starts with the host's onboarding, user-scope MCP
      servers, and project state. Never overwrite an existing copy: it may
-     already hold the container's own state from an earlier rollout. The
-     two copies drift apart after seeding, so a user-scope MCP server
-     added later on one side has to be added on the other too. A
-     project's checked-in `.mcp.json` avoids that, because both sides
-     read it.
+     already hold the container's own state. The copies drift apart after
+     seeding, so a user-scope MCP server added later has to be added on
+     both sides (a checked-in `.mcp.json` avoids that).
 
 3. **Edit `.devcontainer/devcontainer.json`.** It's JSONC, so keep its
    comments and formatting, and merge with existing keys rather than
@@ -126,11 +123,8 @@ the user to continue from a host session.
        docker-compose config, use `env_file:` in the compose service.
      - Also warn that every contributor then gets their own host
        `~/.claude` mounted in. They should agree to that first.
-     - Contributors on a macOS host: the container is still fine,
-       because it uses the mounted `.credentials.json`. But setting
-       `CLAUDE_CONFIG_DIR` in a host-side session was reported to log
-       them out, since Mac login lives in the Keychain. Tell them not to
-       set it on the Mac host itself.
+     - Mac-host contributors: tell them not to set `CLAUDE_CONFIG_DIR`
+       on the host itself (see the Keychain note under Facts).
    - **Key over 64 characters:** leave out `CLAUDE_CODE_PROJECT_DIR_NAME`
      and mount the workspace at its host path, so both sides derive the
      same key on their own. Check first that nothing in the project
@@ -150,11 +144,9 @@ the user to continue from a host session.
 
 4. **Merge migrated data (only if you did step 1).**
    - On the host, run `cp -rn` from `.git/claude-migrate/.` into
-     `~/.claude/projects/<host key>/`. Folder names start with `-`, so
-     use `--` or a `./` prefix.
-   - `-n` keeps the host's `MEMORY.md` if one exists. In that case, add
-     the container's index lines to it by hand, or those memories won't
-     be listed.
+     `~/.claude/projects/<host key>/`. `-n` keeps the host's `MEMORY.md`
+     if one exists; then add the container's index lines to it by hand,
+     or those memories won't be listed.
 
 5. **Rebuild.** If you did step 1, copy the container data out again
    first so the latest conversation comes along. Then merge the
@@ -181,15 +173,14 @@ first, because it's the one most likely to fail.
 
 ## Known limits
 
-- Don't run sessions from the host and the container at the same time
-  in one project, because both write to the same files.
+- Don't run host and container sessions at the same time in one
+  project; both write to the same files.
 - Every project then shares the host's `~/.claude`, so settings, login,
   skills and rules are shared too. Memory stays per project.
 - A session resumed on the other side still carries the other side's
   file paths in its history.
 - Host and container keep separate `.claude.json` state files (see
-  "Facts this relies on"). That covers onboarding, per-project trust and
-  allowed tools, and user-scope MCP servers.
+  "Facts this relies on").
 
 ## Output
 
@@ -198,9 +189,8 @@ Report:
 - Which variant was applied: literal key, env file, or same-path
   workspace.
 - The exact `devcontainer.json` changes.
-- Whether migration was done, and anything that needs a manual
-  `MEMORY.md` merge.
-- Whether `.claude.json` was seeded, or already existed.
+- Whether migration was done (and any manual `MEMORY.md` merge needed),
+  and whether `.claude.json` was seeded or already existed.
 - The acceptance checklist.
 
 Don't rebuild the container yourself. The user does that.

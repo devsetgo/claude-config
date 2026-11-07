@@ -32,9 +32,9 @@ context, and only its findings come back here. That keeps their diffs
 and grep output out of this session.
 
 - **Before delegating,** record:
-  - The base: `git merge-base HEAD origin/<default>`, with the default
-    branch from `git symbolic-ref --short refs/remotes/origin/HEAD`,
-    falling back to `main`.
+  - The base: `git merge-base HEAD origin/<default>`, worked out as the
+    standalone case in `finding-format.md` describes (including the
+    fallback when there's no `origin` remote).
   - The paths of the standards docs found above.
 - **Invoke each `dsg-*-check`** with the arguments `delegated-from=dsg-pr-check
   base=<sha> category="<checklist item name>" docs=<comma-separated
@@ -46,9 +46,13 @@ and grep output out of this session.
   `security-review` and `code-review` delegations. Those last two run as
   they always have.
 - **Take each check's findings as returned.** Don't redo its work inline
-  to double-check it, because that pulls the noise back in. If a check
-  fails or returns nothing usable, invoke it once more. If it fails
-  again, report that item as `FAIL` with "check didn't complete".
+  to double-check it, because that pulls the noise back in.
+  - A check that ends with `Not applicable: <reason>` is `N/A`.
+  - A finding like `<tool> not run: <reason>` is a `FAIL`, never a
+    `PASS`.
+  - If a check fails or returns nothing usable, invoke it once more. If
+    it fails again, report that item as `FAIL` with "check didn't
+    complete".
 
 ## Checklist
 
@@ -86,12 +90,13 @@ and grep output out of this session.
 10. **Secrets & config drift** — delegate to the `dsg-secrets-check` skill.
 
 11. **Changelog freshness** — delegate to the `dsg-changelog-check` skill.
-    Expect `N/A` on repos using Release Drafter or similar automation;
-    that's correct behavior, not a skipped check.
+    Expect `Not applicable` on repos using Release Drafter or similar
+    automation; that's correct behavior, not a skipped check.
 
 12. **API contract breakage** — delegate to the `dsg-api-check`
-    skill. `N/A` if the diff doesn't touch a public API/schema/library
-    contract.
+    skill. `FAIL` only on a `BREAKING` finding; `NON-BREAKING` items are
+    informational. `N/A` if the diff doesn't touch a public API/schema/
+    library contract.
 
 Once the PR is ready to commit, use the separate `dsg-commit` skill
 to draft the commit message/PR title — it's a drafting step, not a
@@ -104,7 +109,7 @@ plus a one-sentence reason. This summary is printed to the conversation,
 not the task list file.
 
 Then merge findings into the shared `TODO_TASKS.md` worklist — see
-`skills/_shared/task-list.md` for the file location, structure, dedup
+`../_shared/task-list.md` for the file location, structure, dedup
 rules, and the cleanup pass to run every time (including runs with zero
 new findings). Tag each item `[dsg-pr-check, <date>, <severity>]` per that
 convention. Defer to a delegated check's own severity call when it makes

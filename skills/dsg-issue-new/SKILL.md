@@ -18,9 +18,10 @@ the user to restate it.
 
 1. Confirm `gh` is installed and authenticated (`gh auth status`) and that
    `gh repo view` resolves — same GitHub-specific prerequisite as
-   `dsg-issue-todo`.
-2. Read `gh label list --json name -q '.[].name'` once up front; reuse
-   that list for the label matching below.
+   `dsg-issue-todo`. If `gh` is missing or not authenticated, stop and
+   offer to save the drafted issue text to a file instead.
+2. Read `gh label list --limit 200 --json name -q '.[].name'` once up
+   front; reuse that list for the label matching below.
 3. Confirm there's an actual plan to draw from — a completed planning
    discussion, a Plan-mode plan, or a clearly described bug with a
    diagnosed cause. If asked to do this before any such plan exists (e.g.
@@ -72,8 +73,12 @@ is the exception, not the default.
 
 ## Confirmation (mandatory, every time)
 
-Show the drafted title, full body, and labels before creating anything,
-exactly as they'd appear on GitHub. Wait for explicit confirmation or
+Before confirming, check for duplicates: `gh issue list --state open
+--search '<title keywords> in:title'`. Then show the target `owner/repo`
+(from `gh repo view --json nameWithOwner -q .nameWithOwner`, since on a
+fork `gh` may target the upstream), any near-match issues found, and the
+drafted title, full body, and labels before creating anything, exactly
+as they'd appear on GitHub. Wait for explicit confirmation or
 edits — never create on the first pass, even when the plan itself was
 already agreed with the user earlier in the conversation. Agreeing to the
 plan is not the same as agreeing to this specific issue text.

@@ -5,7 +5,7 @@ description: Convert TODO_TASKS.md entries into GitHub Issues via the gh CLI, gr
 
 # TODO Backlog → GitHub Issues
 
-Takes the shared `TODO_TASKS.md` worklist (see `skills/_shared/task-list.md`)
+Takes the shared `TODO_TASKS.md` worklist (see `../_shared/task-list.md`)
 and turns unchecked items into GitHub Issues, grouped sensibly instead of
 one issue per line or one giant issue for everything. Creating an issue is
 visible to the whole team, so nothing gets created without the user seeing
@@ -18,22 +18,26 @@ the exact title, body, grouping, and labels first.
    convert.
 2. Confirm `gh` is installed and authenticated (`gh auth status`) and that
    `gh repo view` resolves — this skill is GitHub-specific by design
-   (GitHub Issues), so a repo without a GitHub remote doesn't apply.
-3. Read `gh label list --json name -q '.[].name'` once up front; reuse
-   that list for the label matching below rather than querying per issue.
+   (GitHub Issues), so a repo without a GitHub remote doesn't apply. If
+   `gh` is missing or not authenticated, stop and offer to save the
+   drafted issue text to a file instead.
+3. Read `gh label list --limit 200 --json name -q '.[].name'` once up
+   front; reuse that list for the label matching below rather than
+   querying per issue.
 
 ## Scope
 
-Default: every unchecked item in the file. Accepts an optional filter
+Default: every unchecked item in the file that doesn't already carry
+` → #<n>` (those are already tracked). Accepts an optional filter
 argument: a category heading (e.g. `Sonar — Bugs`), a severity
-(`critical`/`high`/`medium`/`low`), or a source-skill tag (e.g. `sonar`,
+(`critical`/`high`/`medium`/`low`), or a source-skill tag (e.g. `dsg-sonar`,
 `dsg-actions`). Ask the user to confirm the filter only if the argument is
 ambiguous against the headings actually present in the file.
 
 ## Grouping
 
 Every item in `TODO_TASKS.md` carries a category heading and a
-`[<skill>, <date>, <severity>]` tag per `skills/_shared/task-list.md`.
+`[<skill>, <date>, <severity>]` tag per `../_shared/task-list.md`.
 Treat items with no severity tag (written before that convention existed)
 as `medium` and say so in the plan, rather than guessing higher or lower.
 
@@ -55,8 +59,10 @@ different issue, or change severity before anything is created.
 
 Before finalizing the plan, for each candidate item search open issues for
 a reference to its `file:line` (`gh issue list --state open --search
-"<file:line> in:body"`). If a match exists, drop that item from the plan
-and note "already tracked in #<N>" instead of proposing a duplicate.
+'"<file:line>" in:body'` — quoted so GitHub doesn't parse `path:42` as a
+qualifier). For items that carry a Sonar issue key or a CI run ID, search
+on that too. If a match exists, drop that item from the plan and note
+"already tracked in #<N>" instead of proposing a duplicate.
 
 ## Drafting each proposed issue
 
@@ -79,8 +85,10 @@ and note "already tracked in #<N>" instead of proposing a duplicate.
 
 ## Confirmation (mandatory, every time)
 
-Present the full plan before creating anything: for each proposed issue,
-its title, body, labels, and which source lines feed it, plus any dedup
+Present the full plan before creating anything: the target `owner/repo`
+(from `gh repo view --json nameWithOwner -q .nameWithOwner`, since on a
+fork `gh` may target the upstream), then for each proposed issue its
+title, body, labels, and which source lines feed it, plus any dedup
 skips and any label decisions still open. Wait for explicit confirmation
 (or edits) — this step never gets skipped, including on repeat
 invocations in the same session.
@@ -94,16 +102,15 @@ them one at a time so a failure partway through doesn't leave the plan's
 state ambiguous — report each success with its issue number/URL as it
 happens.
 
-After an issue is created successfully, remove the items it covers from
-`TODO_TASKS.md` — they're now tracked on GitHub, and leaving them would
-either duplicate tracking or get miscounted as still-local by the next
-`skills/_shared/task-list.md` cleanup pass. Don't mark them `- [x]`
-(that means "fixed," which isn't true yet); just delete the lines, and
-remove the category heading if that was its last item. Leave items whose
-issue creation failed untouched, still unchecked, in the file.
+After an issue is created successfully, don't delete the items it
+covers. Append ` → #<n>` to each converted item's line and leave it
+unchecked (see `../_shared/task-list.md`), so writer skills don't re-add
+it on their next run. Don't mark them `- [x]` (that means "fixed," which
+isn't true yet). Skip items that already carry ` → #` as already
+tracked. Leave items whose issue creation failed untouched.
 
 ## Output
 
 Report: items considered, items skipped as dedup, issues proposed vs.
 confirmed vs. created, then each created issue's number/URL grouped the
-same way as the plan. Confirm how many `TODO_TASKS.md` lines were removed.
+same way as the plan. Confirm how many `TODO_TASKS.md` lines were annotated with an issue number.

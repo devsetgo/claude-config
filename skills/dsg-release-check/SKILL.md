@@ -11,9 +11,11 @@ accumulated since the last release, not just one diff.
 
 ## Before running any checks
 
-Find the last release tag (e.g. `git describe --tags --abbrev=0`) and use
-the range from there to `HEAD` as the scope for every check below, instead
-of a single PR's diff. Also read this project's own standards docs
+Find the last release tag: the most recent tag matching this project's
+release tag format (`git tag --sort=-v:refname`; `git describe --tags
+--abbrev=0` can pick up an unrelated tag). Use the range from there to
+`HEAD` as the scope for every check below, instead of a single PR's
+diff. Also read this project's own standards docs
 (`CLAUDE.md`, `CONTRIBUTING.md`, `PROJECT_STATUS.md`) if present — the same
 precedence rule as `dsg-pr-check` applies: project conventions win over the
 generic guidance here.
@@ -28,14 +30,14 @@ A forked check can't see this conversation, so:
   `delegated-from=dsg-release-check base=<last release tag>
   category="<checklist item name>" docs=<comma-separated paths>`.
   - Add `scope=full-tree` for `dsg-dep-check` (item 4).
-  - Add `scope=contract-at-base` for `dsg-api-check` (item 3), so it
-    compares the contract at the tag against `HEAD`.
-  - If the repo has no release tag yet, say so and use its first commit
-    (`git rev-list --max-parents=0 HEAD`) as the base.
+  - If the repo has no release tag yet, say so and pass the empty tree
+    (`git hash-object -t tree /dev/null`) as the base, so the first
+    commit's own changes are included.
 - **Start items 1–4 in one turn,** as several Skill calls in a single
   message, then do item 5 inline. Take each check's findings as
-  returned. Re-invoke a failed check once, then report it as `FAIL` with
-  "check didn't complete".
+  returned, and map them the way `dsg-pr-check` does: `Not applicable`
+  is `N/A`, a "not run" finding is `FAIL`. Re-invoke a failed check
+  once, then report it as `FAIL` with "check didn't complete".
 
 ## Checklist
 
@@ -66,17 +68,19 @@ A forked check can't see this conversation, so:
    similar), confirm the draft release notes it has accumulated look
    complete and correctly categorized: no merged PR carrying a label the
    autolabeler doesn't map to a category, no "uncategorized" section with
-   real content sitting in it.
+   real content sitting in it. If the draft already has a tag set, it must
+   match the declared version exactly, following the project's tag
+   convention (with or without a `v`).
 
 ## Output format
 
 Report each item as one line: `PASS` / `FAIL` / `N/A` plus a one-sentence
 reason, same convention as `dsg-pr-check`.
 
-On any FAIL, merge findings into the same shared `TODO_TASKS.md` worklist
-`dsg-pr-check` uses — see `skills/_shared/task-list.md` for the file
-location, structure, dedup rules, and the cleanup pass to run every time
-(including runs with zero new findings). Tag each item
+Then, on every run, update the same shared `TODO_TASKS.md` worklist
+`dsg-pr-check` uses. Run its cleanup pass even when everything passes,
+and add items only for `FAIL`s. See `../_shared/task-list.md` for the file
+location, structure, dedup rules, and the cleanup pass. Tag each item
 `[dsg-release-check, <date>, <severity>]` per that convention, using the
 same severity defaults `dsg-pr-check` uses.
 

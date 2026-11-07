@@ -13,12 +13,17 @@ working copy, so never discard, stash, or rewrite anything in it.
 
 ## Steps
 
-1. **Find the clone.** Resolve `${CLAUDE_CONFIG_DIR:-~/.claude}/skills`
+1. **Find the clone.** Resolve `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills`
    with `readlink -f`. The clone is the parent of that directory. Confirm
    it's a git repo with an `install.sh` at its root. If `skills` isn't a
    symlink, claude-config was never installed here. Say so and point to
    the Setup section of the clone's `README.md` (or the repo's), instead
    of guessing a location.
+
+   Every later git command must run against the clone, not the current
+   project: use `git -C <clone> ...`. For `gh`, pass `-R <owner/repo>`
+   taken from the clone's `origin` URL (`git -C <clone> remote get-url
+   origin`). Run the installer as `<clone>/install.sh`.
 
 2. **Inspect before changing anything.**
    - Find the default branch from `git symbolic-ref --short
@@ -61,8 +66,8 @@ working copy, so never discard, stash, or rewrite anything in it.
      installer or hook changes.
    - Then run `git merge --ff-only origin/<default>`.
 
-5. **Re-install and verify.** Run `./install.sh` from the clone, then
-   `./install.sh --check`. Report any failures verbatim. A link conflict
+5. **Re-install and verify.** Run `<clone>/install.sh`, then
+   `<clone>/install.sh --check`. Report any failures verbatim. A link conflict
    means a real file or directory is in the way; tell the user to move it
    aside themselves.
    - Inside a devcontainer that shares the host's config dir

@@ -11,10 +11,8 @@ background: false
 Find changed functions that have tricky logic and zero explanation — not
 functions that are merely uncommented.
 
-Runs as a forked sub-agent with no conversation history: first read
-`../_shared/finding-format.md` (relative to this skill's directory). It
-defines the scope to check, from the arguments or worked out yourself
-when there are none, and how to report.
+Forked run: first read `../_shared/finding-format.md` (relative to this
+skill's directory) for the scope, arguments, and how to report.
 
 ## Steps
 
@@ -34,5 +32,5 @@ when there are none, and how to report.
 
 A list of flagged functions, each with: file:line, a one-line description
 of the non-obvious thing that needs explaining, and (if easy to infer) a
-suggested comment. See `skills/_shared/finding-format.md` for the
+suggested comment. See `../_shared/finding-format.md` for the
 standalone-vs-delegated reporting convention.

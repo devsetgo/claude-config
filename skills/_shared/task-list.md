@@ -28,6 +28,12 @@ how bad the finding is — it's what makes the cleanup pass below possible
 without a separate tracking file, and what a skill like `dsg-issue-todo` needs
 to group items sensibly when turning them into GitHub Issues.
 
+An item that has a GitHub issue carries ` → #<n>` at the end of its line
+(added by `dsg-issue-todo`). It stays in the file, unchecked, so the
+dedup rule below stops writer skills from re-adding it on their next
+run. Cleanup step 1 still removes it once the finding no longer
+reproduces.
+
 ```markdown
 # TODO Tasks
 
@@ -76,8 +82,9 @@ that finds nothing new
    under its category (checked or not), remove that item outright — it's
    fixed, and a clean pass is exactly when there's evidence of that. Don't
    just leave resolved items sitting there checked indefinitely.
-2. **Prune old checked items.** Remove any `- [x]` item whose date tag is
-   more than 14 days old, regardless of category or which skill added it.
+2. **Prune old checked items.** Remove any `- [x]` item more than 14
+   days past its `(done YYYY-MM-DD)` date (fall back to the tag date if
+   it has none), regardless of category or which skill added it.
    A checked item is a short breadcrumb for "recently resolved," not a
    permanent log — git history is the permanent record.
 3. Remove any category heading left with no items after this pass.
@@ -86,6 +93,7 @@ that finds nothing new
 
 Work through unchecked items one at a time (with the user, or in a
 follow-up turn): fix it, re-run the specific check that flagged it to
-confirm, then mark it `- [x]` — keep the original date tag, don't rewrite
-it to today. It gets pruned automatically the next time cleanup runs, per
-above.
+confirm, then mark it `- [x]` — keep the original tag and append
+` (done YYYY-MM-DD)` with today's date, so a long-standing item fixed
+today isn't pruned on the next run. It gets pruned automatically once
+that date is more than 14 days old, per above.

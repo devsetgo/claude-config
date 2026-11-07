@@ -6,4 +6,4 @@ step under an `## In progress` heading at the top of the project's
 gitignored `TODO_TASKS.md`. Add the `.gitignore` entry if it's missing.
 A SessionStart hook loads that section into each new session, so update
 it when the state changes and delete it when the work is done. Format:
-`~/.claude/skills/_shared/task-list.md`.
+`skills/_shared/task-list.md` under `${CLAUDE_CONFIG_DIR:-~/.claude}`.

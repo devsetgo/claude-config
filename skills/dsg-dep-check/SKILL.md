@@ -11,10 +11,8 @@ background: false
 Focus on dependencies the diff actually touches — new packages and version
 bumps — not a full inventory of everything already in the lockfile.
 
-Runs as a forked sub-agent with no conversation history: first read
-`../_shared/finding-format.md` (relative to this skill's directory). It
-defines the scope to check, from the arguments or worked out yourself
-when there are none, and how to report.
+Forked run: first read `../_shared/finding-format.md` (relative to this
+skill's directory) for the scope, arguments, and how to report.
 
 ## Steps
 
@@ -24,8 +22,11 @@ when there are none, and how to report.
    `Cargo.lock`, `go.mod`/`go.sum`, etc.).
 2. Run the ecosystem's audit tool if it's available in this environment
    (`npm audit`, `pip-audit`, `cargo audit`, `govulncheck`, etc.). If no
-   audit tool is installed, say so rather than trying to install new
-   tooling — don't add dependencies to solve a dependency-check task.
+   audit tool is installed or it needs network access you don't have,
+   report `audit not run: <reason>` as a finding (see
+   `finding-format.md`). Don't install new tooling to get it running.
+   With `scope=full-tree`, audit the whole dependency tree, not just what
+   the diff touched.
 3. Cross-reference the diff specifically: which packages were added or had
    their version bumped. Prioritize findings on those over pre-existing
    transitive deps outside the diff's control.
@@ -41,7 +42,8 @@ when there are none, and how to report.
      as lower-confidence and say so; don't fabricate a specific last-release
      date if you can't verify one
 5. Don't flag a transitive dependency the diff didn't introduce unless a
-   direct, in-diff fix exists (e.g. bumping a direct dependency pulls in a
+   direct, in-diff fix exists. This step doesn't apply under
+   `scope=full-tree` (e.g. bumping a direct dependency pulls in a
    patched transitive version).
 
 ## Output
@@ -49,5 +51,5 @@ when there are none, and how to report.
 A list of findings, each with: package name, version, issue type
 (vulnerability/license/unused/stale), and a suggested action (bump to
 version X, remove, replace, or "no fix available yet — track it"). See
-`skills/_shared/finding-format.md` for the standalone-vs-delegated
+`../_shared/finding-format.md` for the standalone-vs-delegated
 reporting convention.
