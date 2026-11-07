@@ -60,7 +60,9 @@ belongs in the target project's own `CLAUDE.md`, not here.
   `settings.json`: `dsg-update-check.sh` (reports when the clone is
   behind, suggesting `dsg-update`) and `dsg-tasks-context.sh` (loads
   `TODO_TASKS.md`'s `## In progress` section). `settings_hook.py` merges
-  one entry per script into `settings.json`, and `settings_env.py` (which
+  one entry per script into `settings.json` (and its `prune` mode drops
+  entries for hooks under `hooks/` that no longer exist, so renaming or
+  removing a hook script is safe), and `settings_env.py` (which
   reuses its load/save) sets the opt-in `CLAUDE_CODE_SUBAGENT_MODEL` from
   `DSG_SUBAGENT_MODEL`. Hooks must never block or
   fail a session: keep network calls in detached background jobs, and

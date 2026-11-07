@@ -114,6 +114,23 @@ run HOME="$H" DSG_UPDATE_NO_CHECK=1 DSG_TASKS_NO_CONTEXT=1 "$REPO_DIR/install.sh
 python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); assert "hooks" not in d, d' \
   "$H/.claude/settings.json" || fail "empty hooks block left behind"
 
+echo "== prunes entries for this repo's hooks that no longer exist, keeps others"
+H="$WORK/stale"; mkdir -p "$H/.claude"
+cat > "$H/.claude/settings.json" <<JSON
+{"hooks": {"SessionStart": [
+  {"matcher": "startup", "hooks": [{"type": "command", "command": "$REPO_DIR/hooks/old-renamed-hook.sh"}]},
+  {"matcher": "", "hooks": [{"type": "command", "command": "/elsewhere/missing.sh"}]}
+]}}
+JSON
+run HOME="$H" "$REPO_DIR/install.sh" >/dev/null
+python3 - "$H/.claude/settings.json" <<'PY' || fail "stale entry not pruned, or a foreign one was"
+import json, sys
+cmds = [h["command"] for g in json.load(open(sys.argv[1]))["hooks"]["SessionStart"] for h in g["hooks"]]
+assert not any("old-renamed-hook.sh" in c for c in cmds), cmds
+assert "/elsewhere/missing.sh" in cmds, cmds
+assert sum("dsg-" in c for c in cmds) == 2, cmds
+PY
+
 env_val() {
   python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("env", {}).get("CLAUDE_CODE_SUBAGENT_MODEL", ""))' "$1"
 }

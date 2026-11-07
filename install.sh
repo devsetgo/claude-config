@@ -118,6 +118,13 @@ register_hook() {
   fi
 }
 
+# Drop entries left behind by a renamed or removed hook in this repo, which
+# would otherwise fail at every session start.
+if [ "$MODE" = install ] && command -v python3 >/dev/null 2>&1; then
+  python3 "$REPO_DIR/hooks/settings_hook.py" prune "$SETTINGS" "$REPO_DIR/hooks" \
+    || echo "warning: couldn't prune stale hook entries in $SETTINGS (left unchanged)." >&2
+fi
+
 register_hook dsg-update dsg-update-check.sh DSG_UPDATE_NO_CHECK startup
 # Every session source, so in-progress work comes back after /clear and
 # compaction too, not just on a fresh start.
