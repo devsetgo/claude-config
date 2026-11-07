@@ -4,22 +4,35 @@ on:
   push:
     branches:
       - main
-  # pull_request_target supports autolabeler for PRs from forks
+  # pull_request_target supports autolabeler for PRs from forks; "edited"
+  # re-runs it when a PR is retitled, since labels come from the title here.
   pull_request_target:
-    types: [opened, reopened, synchronize]
+    types: [opened, reopened, synchronize, edited]
 
 permissions:
   contents: read
 
 jobs:
   update_release_draft:
+    if: github.event_name == 'push'
     permissions:
       # write permission is required to create/update the draft release
       contents: write
-      # write permission is required for autolabeler
+      pull-requests: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: release-drafter/release-drafter@v7.10.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Since v7 the drafter no longer applies the autolabeler rules itself.
+  auto_label:
+    if: github.event_name == 'pull_request_target'
+    permissions:
+      contents: read
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - uses: release-drafter/release-drafter@v7.7.0
+      - uses: release-drafter/release-drafter/autolabeler@v7.10.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -75,7 +75,12 @@ belongs in the target project's own `CLAUDE.md`, not here.
   informational only, so don't publish the draft as a numbered release.
   PR titles in Conventional Commits style (`feat:`, `fix:`, `chore:`,
   etc.) get autolabeled correctly regardless of branch name; see the
-  `dsg-commit` skill for drafting those.
+  `dsg-commit` skill for drafting those. Since Release Drafter v7 the
+  autolabeler is a separate `release-drafter/autolabeler` action, run as
+  its own job on `pull_request_target` (including `edited`, so a retitle
+  relabels); the drafter job only runs on push to `main`. Keep the
+  `title:` autolabeler rules — PRs here come from `dev`, so `branch:`
+  rules alone never match.
 - `.github/workflows/autofill-pr.yml` — runs `devsetgo/ai-pr-assistant`
   (OpenAI, `OPENAI_API_KEY` repo secret) to fill in PR descriptions
   ("smart": keeps a good one, extends or replaces a thin one), titles,
