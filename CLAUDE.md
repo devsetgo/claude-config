@@ -58,6 +58,8 @@ belongs in the target project's own `CLAUDE.md`, not here.
   one entry per script into `settings.json`. Hooks must never block or
   fail a session: keep network calls in detached background jobs, and
   keep output small, because it lands in every session's context.
+- `VERSION` + `bumpcalver.toml` — the current release version and the
+  BumpCalver config that bumps it (see Repo automation).
 - `install.sh` — symlinks `skills/` to `~/.claude/skills` and
   `global/rules/` to `~/.claude/rules`, and registers the hooks above;
   this is what
@@ -83,9 +85,8 @@ belongs in the target project's own `CLAUDE.md`, not here.
   tasks-context hook against sample `TODO_TASKS.md` files.
 - `.github/workflows/release-drafter.yml` +
   `.github/release-drafter.yml` — drafts a categorized changelog from
-  merged PRs, visible in the GitHub Releases tab. This repo doesn't tag
-  versioned releases (see the comment at the top of the config) — it's
-  informational only, so don't publish the draft as a numbered release.
+  merged PRs, visible in the GitHub Releases tab. Don't publish the draft
+  by hand; the Release workflow below does that.
   PR titles in Conventional Commits style (`feat:`, `fix:`, `chore:`,
   etc.) get autolabeled correctly regardless of branch name; see the
   `dsg-commit` skill for drafting those. Since Release Drafter v7 the
@@ -94,6 +95,16 @@ belongs in the target project's own `CLAUDE.md`, not here.
   relabels); the drafter job only runs on push to `main`. Keep the
   `title:` autolabeler rules — PRs here come from `dev`, so `branch:`
   rules alone never match.
+- `.github/workflows/release.yml` — manual (`workflow_dispatch`, `main`
+  only) release: BumpCalver bumps `VERSION` to `YYYY.MM.DD.N` (the build
+  number counts releases that UTC day; see `bumpcalver.toml`), commits and
+  tags it (bare tag, no `v`), pushes, and publishes Release Drafter's draft
+  under that tag. Versioning is CalVer via BumpCalver, never SemVer.
+  Releases mark batches; clones still track `main` itself (dotfiles always
+  clones the branch), and the `dsg-update` hook announces only a new
+  release once `VERSION` exists. Never edit `VERSION` or create release
+  tags by hand. Run `dsg-release-check` before cutting one. After a release,
+  fast-forward `dev` to `main`, since the bump commit lands on `main`.
 - `.github/workflows/autofill-pr.yml` — runs `devsetgo/ai-pr-assistant`
   (OpenAI, `OPENAI_API_KEY` repo secret) to fill in PR descriptions
   ("smart": keeps a good one, extends or replaces a thin one), titles,

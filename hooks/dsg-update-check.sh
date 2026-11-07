@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # SessionStart hook (registered by install.sh): tells the user when this
 # claude-config clone is behind its remote, and suggests /dsg-update.
+# Once releases exist, that means "a newer release is out" (see below).
 #
 # Never slows a session down or fails it: the "behind?" check only compares
 # local refs, and the network fetch that refreshes them runs detached in the
@@ -40,7 +41,22 @@ fi
 behind="$(git_ rev-list --count "HEAD..refs/remotes/origin/$default")" || exit 0
 [ "${behind:-0}" -gt 0 ] 2>/dev/null || exit 0
 
-s=s; [ "$behind" -eq 1 ] && s=
-msg="claude-config is $behind commit$s behind origin/$default. Run /dsg-update to update."
+# Releases (VERSION, bumped by the Release workflow) batch the notice: when
+# the remote has a VERSION file, only a new release is announced, not every
+# merge since yours. Without one (before the first release), fall back to
+# counting commits.
+remote_v="$(git_ show "refs/remotes/origin/$default:VERSION" | head -1)"
+local_v="$(git_ show HEAD:VERSION | head -1)"
+# Both go into hand-built JSON below; refuse anything that isn't a plain
+# version string.
+case "$remote_v$local_v" in *[!0-9A-Za-z.-]*) exit 0 ;; esac
+
+if [ -n "$remote_v" ]; then
+  [ "$remote_v" != "$local_v" ] || exit 0
+  msg="claude-config $remote_v is available (you have ${local_v:-a pre-release clone}). Run /dsg-update to update."
+else
+  s=s; [ "$behind" -eq 1 ] && s=
+  msg="claude-config is $behind commit$s behind origin/$default. Run /dsg-update to update."
+fi
 printf '{"systemMessage":"%s","hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s If the user asks to update claude-config, use the dsg-update skill; otherwise mention it once and do not run it unprompted."}}\n' \
   "$msg" "$msg"

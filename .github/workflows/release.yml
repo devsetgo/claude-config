@@ -1,0 +1,64 @@
+name: Release
+
+# Cuts a CalVer release from main: BumpCalver bumps VERSION
+# (YYYY.MM.DD.N, see bumpcalver.toml), commits and tags it, this pushes
+# both, then Release Drafter publishes its accumulated draft under that
+# tag as the release notes. Run from the Actions tab, or
+# `gh workflow run release.yml --ref main`.
+#
+# Releases are what the dsg-update hook announces; clones still track
+# main itself (VS Code's dotfiles feature always clones the branch), so
+# a release marks a batch, it doesn't gate what anyone runs.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      # push the bump commit + tag, and publish the release
+      contents: write
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - run: pip install bumpcalver==2026.10.18.1
+
+      - name: Bump VERSION, commit, and tag
+        id: bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          bumpcalver --build
+          echo "version=$(cat VERSION)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      # Pushes made with GITHUB_TOKEN don't trigger other workflows, so
+      # this doesn't re-run Release Drafter's push job on main.
+      - name: Push commit and tag
+        env:
+          VERSION: ${{ steps.bump.outputs.version }}
+        run: git push origin HEAD:main "refs/tags/$VERSION"
+
+      - uses: release-drafter/release-drafter@v7.10.0
+        with:
+          version: ${{ steps.bump.outputs.version }}
+          tag: ${{ steps.bump.outputs.version }}
+          name: ${{ steps.bump.outputs.version }}
+          commitish: ${{ steps.bump.outputs.sha }}
+          publish: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

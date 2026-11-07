@@ -24,8 +24,12 @@ working copy, so never discard, stash, or rewrite anything in it.
    - Find the default branch from `git symbolic-ref --short
      refs/remotes/origin/HEAD`, falling back to `main`.
    - Get the current branch and `git status --porcelain`.
-   - Run `git fetch origin`. If the fetch fails (offline, auth), report
-     that and stop.
+   - Run `git fetch --tags origin`. If the fetch fails (offline, auth),
+     report that and stop.
+   - Read the version on each side: `git show HEAD:VERSION` and `git show
+     origin/<default>:VERSION`. These are CalVer `YYYY.MM.DD.N` versions
+     cut by the repo's Release workflow. If either is missing, the clone
+     predates releases.
    - Count ahead/behind with `git rev-list --left-right --count
      HEAD...origin/<default>`.
 
@@ -45,7 +49,13 @@ working copy, so never discard, stash, or rewrite anything in it.
      up-to-date clone with broken links is worth catching.
 
 4. **Show what's coming, then update.**
-   - Summarize `git log --oneline HEAD..origin/<default>`.
+   - If the versions differ, lead with "`<local>` → `<remote>`". Use the
+     release notes for each release in between as the summary: `gh
+     release view <tag>` if `gh` is available, or the tags from `git tag
+     --merged origin/<default> --no-merged HEAD`. Then mention any
+     commits after the newest release separately as unreleased.
+   - Otherwise (no releases yet, or only unreleased commits), summarize
+     `git log --oneline HEAD..origin/<default>`.
    - From `git diff --stat HEAD..origin/<default>`, call out skills
      added or removed under `skills/`, changes under `global/rules/`, and
      installer or hook changes.
@@ -69,7 +79,7 @@ working copy, so never discard, stash, or rewrite anything in it.
 ## Output
 
 A short report covering:
-- Where the clone is.
+- Where the clone is, and its version before and after.
 - What changed (commit summary, plus notable skills, rules, or installer
   changes).
 - Whether it updated, or exactly why not.
