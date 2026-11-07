@@ -35,6 +35,19 @@ taken from the docs:
 - With both set, the container saves memory and transcripts into the
   host's folder. The host session reads them, including topic files,
   with no permission prompts.
+- **Setting `CLAUDE_CONFIG_DIR` also moves Claude Code's state file.**
+  It reads `$CLAUDE_CONFIG_DIR/.claude.json` instead of `~/.claude.json`.
+  That file holds onboarding, per-project state such as trust and
+  allowed tools, and user-scope MCP servers. The host, running without
+  the variable, keeps using `~/.claude.json`. So the two sides have
+  separate state files. The container's survives rebuilds, because it
+  sits in the mounted dir. Memory, transcripts, settings, skills and
+  rules are still shared.
+- On Linux, login lives in `.credentials.json` inside the config dir, so
+  it's shared. A contributor reported that on macOS, login lives in the
+  Keychain instead: setting `CLAUDE_CONFIG_DIR` in a Mac host session
+  printed "Not logged in" until they logged in again. That's untested
+  here, and it only matters for a session run on a Mac host.
 
 ## Where this runs
 
@@ -70,6 +83,15 @@ the user to continue from a host session.
      confirm.
    - **If the key is over 64 characters**, `CLAUDE_CODE_PROJECT_DIR_NAME`
      won't work. Use the same-path workspace mount in step 3 instead.
+   - **Seed the container's state file.** If `~/.claude/.claude.json`
+     doesn't exist yet, run `cp -p ~/.claude.json ~/.claude/.claude.json`.
+     The container then starts with the host's onboarding, user-scope MCP
+     servers, and project state. Never overwrite an existing copy: it may
+     already hold the container's own state from an earlier rollout. The
+     two copies drift apart after seeding, so a user-scope MCP server
+     added later on one side has to be added on the other too. A
+     project's checked-in `.mcp.json` avoids that, because both sides
+     read it.
 
 3. **Edit `.devcontainer/devcontainer.json`.** It's JSONC, so keep its
    comments and formatting, and merge with existing keys rather than
@@ -104,6 +126,11 @@ the user to continue from a host session.
        docker-compose config, use `env_file:` in the compose service.
      - Also warn that every contributor then gets their own host
        `~/.claude` mounted in. They should agree to that first.
+     - Contributors on a macOS host: the container is still fine,
+       because it uses the mounted `.credentials.json`. But setting
+       `CLAUDE_CONFIG_DIR` in a host-side session was reported to log
+       them out, since Mac login lives in the Keychain. Tell them not to
+       set it on the Mac host itself.
    - **Key over 64 characters:** leave out `CLAUDE_CODE_PROJECT_DIR_NAME`
      and mount the workspace at its host path, so both sides derive the
      same key on their own. Check first that nothing in the project
@@ -145,6 +172,10 @@ first, because it's the one most likely to fail.
 - [ ] The `dsg-*` skills are listed, and a new session shows the
   `## In progress` section of `TODO_TASKS.md` if one exists.
 - [ ] Claude is still logged in after a second rebuild.
+- [ ] If you use user-scope MCP servers, `claude mcp list` in the
+  container shows the same ones as on the host, from the seeded
+  `.claude.json`. Expect a one-time trust prompt, because the
+  container's workspace path differs from the host's.
 - [ ] `git status` shows no Claude data, and `.git/claude-migrate` is
   deleted once the checks pass.
 
@@ -156,6 +187,9 @@ first, because it's the one most likely to fail.
   skills and rules are shared too. Memory stays per project.
 - A session resumed on the other side still carries the other side's
   file paths in its history.
+- Host and container keep separate `.claude.json` state files (see
+  "Facts this relies on"). That covers onboarding, per-project trust and
+  allowed tools, and user-scope MCP servers.
 
 ## Output
 
@@ -166,6 +200,7 @@ Report:
 - The exact `devcontainer.json` changes.
 - Whether migration was done, and anything that needs a manual
   `MEMORY.md` merge.
+- Whether `.claude.json` was seeded, or already existed.
 - The acceptance checklist.
 
 Don't rebuild the container yourself. The user does that.
