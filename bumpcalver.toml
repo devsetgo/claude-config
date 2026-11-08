@@ -3,6 +3,8 @@
 # (resets to 1 each day). Run `bumpcalver --build` in a "Prepare release"
 # PR. It only rewrites VERSION; the tag is created when the Release
 # Drafter draft is published with that version as its tag.
+# Needs BumpCalver 2026.10.18.1 or later: 2026.5.24.1 backs up a
+# file_type = "text" file like VERSION but never rewrites it.
 version_format = "{current_date}.{build_count}"
 date_format = "%Y.%m.%d"
 timezone = "UTC"
